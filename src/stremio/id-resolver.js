@@ -3,8 +3,8 @@
  *
  * Resolves IMDB IDs (tt...) to TMDB IDs using fast caching and dual fallback:
  *   1. Bounded in-memory LRU cache O(1)
- *   2. Cinemeta (v3-cinemeta.strem.io)
- *   3. TMDB Proxy (db.wecollege.net/3/find)
+ *   2. TMDB /find via the wecollege proxy (db.wecollege.net/3/find), the authority on TMDB ids
+ *   3. Cinemeta (v3-cinemeta.strem.io) as fallback: its moviedb_id can be stale
  */
 
 const CINEMETA_URL = "https://v3-cinemeta.strem.io/meta";
@@ -12,6 +12,7 @@ const WECOLLEGE_FIND = "https://db.wecollege.net/3/find";
 
 const imdbToTmdbCache = new Map();
 const MAX_CACHE_SIZE = 500;
+const LOOKUP_TIMEOUT_MS = 2500;
 
 function setCache(imdbId, tmdbId) {
   if (imdbToTmdbCache.size >= MAX_CACHE_SIZE) {
@@ -19,6 +20,41 @@ function setCache(imdbId, tmdbId) {
     imdbToTmdbCache.delete(oldest);
   }
   imdbToTmdbCache.set(imdbId, tmdbId);
+}
+
+// GET a JSON body within LOOKUP_TIMEOUT_MS; null on any failure (timeout, non-2xx, bad JSON).
+async function fetchJsonOrNull(url) {
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS) : null;
+  try {
+    const res = await fetch(url, {
+      signal: controller ? controller.signal : undefined,
+      headers: { "User-Agent": "Mozilla/5.0" },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    return null;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+// TMDB /find (through the wecollege proxy): the first result of the requested kind, else the other kind.
+async function findViaTmdb(imdbId, stremioType) {
+  const data = await fetchJsonOrNull(`${WECOLLEGE_FIND}/${imdbId}?external_source=imdb_id`);
+  if (!data) return null;
+  const movie = data.movie_results && data.movie_results[0];
+  const tv = data.tv_results && data.tv_results[0];
+  const hit = stremioType === "series" ? tv || movie : movie || tv;
+  return hit && hit.id ? String(hit.id) : null;
+}
+
+// Cinemeta's meta.moviedb_id (fallback only: it can be stale, see resolveTmdbId).
+async function findViaCinemeta(imdbId, stremioType) {
+  const data = await fetchJsonOrNull(`${CINEMETA_URL}/${stremioType}/${imdbId}.json`);
+  const id = data && data.meta && (data.meta.moviedb_id || data.meta.tmdb_id);
+  return id ? String(id) : null;
 }
 
 /**
@@ -52,55 +88,15 @@ async function resolveTmdbId(rawId, mediaType) {
 
   const stremioType = mediaType === "series" || mediaType === "tv" ? "series" : "movie";
 
-  // Attempt 1: Cinemeta
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 2500);
-    const res = await fetch(`${CINEMETA_URL}/${stremioType}/${imdbId}.json`, {
-      signal: controller.signal,
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-    clearTimeout(timer);
-
-    if (res.ok) {
-      const data = await res.json();
-      const tmdbId = data && data.meta && (data.meta.moviedb_id || data.meta.tmdb_id);
-      if (tmdbId) {
-        const result = String(tmdbId);
-        setCache(imdbId, result);
-        return result;
-      }
-    }
-  } catch (e) {
-    // Cinemeta failed, try fallback
+  // TMDB's own /find answers first: it is the authority on its ids. Cinemeta's moviedb_id can
+  // point at a dead TMDB entry (tt5109280 "Raya and the Last Dragon" -> 508441 instead of
+  // 527774), and every provider is keyed by the TMDB id, so a stale one empties them all.
+  // Cinemeta stays as the fallback for when the TMDB proxy is down or has no match.
+  const tmdbId = (await findViaTmdb(imdbId, stremioType)) || (await findViaCinemeta(imdbId, stremioType));
+  if (tmdbId) {
+    setCache(imdbId, tmdbId);
+    return tmdbId;
   }
-
-  // Attempt 2: wecollege TMDB find proxy
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 2500);
-    const res = await fetch(`${WECOLLEGE_FIND}/${imdbId}?external_source=imdb_id`, {
-      signal: controller.signal,
-      headers: { "User-Agent": "Mozilla/5.0" },
-    });
-    clearTimeout(timer);
-
-    if (res.ok) {
-      const data = await res.json();
-      const results =
-        stremioType === "series"
-          ? (data.tv_results && data.tv_results[0]) || (data.movie_results && data.movie_results[0])
-          : (data.movie_results && data.movie_results[0]) || (data.tv_results && data.tv_results[0]);
-      if (results && results.id) {
-        const result = String(results.id);
-        setCache(imdbId, result);
-        return result;
-      }
-    }
-  } catch (e) {
-    // Fallback failed
-  }
-
   return null;
 }
 

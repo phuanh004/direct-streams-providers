@@ -7,7 +7,7 @@
         "serve": "node server.js",
         "companion": "node scripts/flystream-companion.js",
         "test": "npm run test:offline && node test-7movies.js && node test-movy.js && node test-stremio.js",
-        "test:offline": "node test-offline-units.js && node test-router-offline.js && node test-flystream.js && node test-challenge-browser-offline.js && node test-movy-offline.js"
+        "test:offline": "node test-offline-units.js && node test-router-offline.js && node test-id-resolver-offline.js && node test-flystream.js && node test-challenge-browser-offline.js && node test-movy-offline.js"
     },
     "devDependencies": {
         "esbuild": "^0.20.0"
