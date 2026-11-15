@@ -144,7 +144,9 @@ section{padding:84px 0 10px}
 @media(max-width:520px){.devgrid{grid-template-columns:1fr}}
 .dev{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:18px;text-align:left;width:100%;color:var(--ink)}
 .dev[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.dev .ic{font-size:28px;display:block}
+.dev[aria-pressed="true"] .ic{color:var(--accent)}
+.dev .ic{display:block;transition:color .2s ease}
+.dev .ic svg{width:28px;height:28px;display:block}
 .dev b{display:block;margin-top:8px;font-size:17px}
 .dev small{color:var(--muted)}
 .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
@@ -355,10 +357,10 @@ footer a{color:inherit}
     <div class="sec-head rv"><div><div class="num">05 — DAILY USE</div><h2>Every day,<br><em>every screen.</em></h2></div><p>Setup is once. This is the part you live in. Tap a device to see its job — the system is designed so each screen does what it's best at.</p></div>
 
     <div class="devgrid rv" role="group" aria-label="Pick a device">
-      <button class="dev" aria-pressed="true" data-dev="tv"><span class="ic">📺</span><b>TV — the cinema</b><small>Watch here. Big screen, hardware decode, 4K.</small></button>
-      <button class="dev" aria-pressed="false" data-dev="phone"><span class="ic">📱</span><b>Phone — the remote brain</b><small>Discover, queue, manage plugins, fix things.</small></button>
-      <button class="dev" aria-pressed="false" data-dev="tablet"><span class="ic">▦</span><b>Tablet — the couch screen</b><small>Second screen, travel, kids, kitchen.</small></button>
-      <button class="dev" aria-pressed="false" data-dev="desk"><span class="ic">💻</span><b>Laptop — the workshop</b><small>Server host, updates, testing, Stremio.</small></button>
+      <button class="dev" aria-pressed="true" data-dev="tv"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-tv" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M16 3l-4 4l-4 -4" /></svg></span><b>TV — the cinema</b><small>Watch here. Big screen, hardware decode, 4K.</small></button>
+      <button class="dev" aria-pressed="false" data-dev="phone"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-mobile" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 3m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" /><path d="M11 4h2" /><path d="M12 17l.01 0" /></svg></span><b>Phone — the remote brain</b><small>Discover, queue, manage plugins, fix things.</small></button>
+      <button class="dev" aria-pressed="false" data-dev="tablet"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-tablet" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 4m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" /><path d="M12 17l.01 0" /></svg></span><b>Tablet — the couch screen</b><small>Second screen, travel, kids, kitchen.</small></button>
+      <button class="dev" aria-pressed="false" data-dev="desk"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-laptop" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19l18 0" /><path d="M5 6m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" /></svg></span><b>Laptop — the workshop</b><small>Server host, updates, testing, Stremio.</small></button>
     </div>
     <div class="panel rv" id="devPanel" style="margin-top:12px"></div>
 

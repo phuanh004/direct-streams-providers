@@ -1,446 +1,1563 @@
 <!doctype html>
 <html lang="vi">
+
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<meta name="color-scheme" content="light dark"/>
-<link rel="icon" href="data:,"/>
-<title>Direct Streams Providers — Hướng Dẫn Cài Đặt & Sử Dụng Hàng Ngày</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,600;0,800;0,900;1,600&family=Newsreader:ital,opsz,wght@1,6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#0a0a09; --bg2:#121110; --surface:#171614; --ink:#f2efe9; --muted:#9c968a; --line:#2a2824;
-  --accent:#ff3b00; --accent2:#ffb800; --teal:#2dd4bf; --card:#141311;
-  --code:#000; --code-ink:#ffb800;
-}
-@media (prefers-color-scheme: light){
-  :root{ --bg:#f4f2ec; --bg2:#ece9e0; --surface:#fff; --ink:#11100e; --muted:#6d675c; --line:#ddd8cb; --card:#fff; --code:#11100e; }
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Archivo",system-ui,-apple-system,sans-serif;line-height:1.6;overflow-x:hidden}
-a{color:inherit}
-button{font:inherit;min-height:44px;min-width:44px;cursor:pointer}
-.mono{font-family:"IBM Plex Mono",monospace}
-.serif-i{font-family:"Newsreader",serif;font-style:italic;font-weight:500}
-/* ---------- fixed frame : four corners ---------- */
-.frame{position:fixed;inset:0;pointer-events:none;z-index:50;display:flex;flex-direction:column;justify-content:space-between;padding:14px 18px}
-.frame-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.frame a,.frame button{pointer-events:auto}
-.brand{font-weight:900;letter-spacing:-.03em;font-size:15px;text-decoration:none;line-height:1}
-.brand span{color:var(--accent)}
-.fnav{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.fnav a{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;border:1px solid var(--line);background:color-mix(in srgb, var(--bg) 82%, transparent);backdrop-filter:blur(8px);padding:8px 11px;border-radius:999px}
-.fnav a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
-.fmeta{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-.fmeta b{color:var(--ink)}
-.progressline{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0%;z-index:60}
-.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
-/* ---------- hero ---------- */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:110px 0 0;position:relative}
-.hero-kicker{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.hero-kicker b{color:var(--teal)}
-.hero h1{font-size:clamp(48px,11vw,138px);line-height:1.08;letter-spacing:-.035em;font-weight:900;text-transform:uppercase;margin:26px 0 12px}
-.hero h1 .line{display:block;overflow:hidden;padding:.14em 0 .1em;margin:-.06em 0}
-.hero h1 .line>span{display:block;animation:rise .9s cubic-bezier(.22,1,.36,1) both}
-.hero h1 .line:nth-child(2)>span{animation-delay:.12s}
-.hero h1 .line:nth-child(3)>span{animation-delay:.24s}
-@keyframes rise{from{transform:translateY(115%)}to{transform:translateY(0)}}
-.hero h1 em{font-family:"Newsreader",serif;font-style:italic;font-weight:500;text-transform:none;letter-spacing:-.02em;color:var(--accent)}
-.hero-sub{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:start;margin:18px 0 28px}
-@media(max-width:820px){.hero-sub{grid-template-columns:1fr}}
-.hero-sub p{font-size:clamp(17px,2.2vw,21px);line-height:1.55;margin:0;max-width:620px}
-.hero-sub p strong{background:var(--accent);color:#fff;padding:0 6px}
-.hero-cta{display:flex;gap:10px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:999px;border:1px solid var(--ink);font-size:15px}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn:hover{transform:translateY(-1px)}
-/* TV mock — real product UI, not a photo */
-.tv{border:1px solid var(--line);background:#000;color:#fff;border-radius:18px;overflow:hidden}
-.tv-top{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #222;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.07em;color:#9ca3af}
-.tv-top b{color:#fff}
-.tv-body{padding:18px}
-.tv-title{font-size:clamp(24px,3.6vw,36px);font-weight:900;line-height:1.18;letter-spacing:-.03em}
-.tv-title em{font-family:"Newsreader",serif;font-style:italic;font-weight:500;color:var(--accent2)}
-.streamrow{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #262626;background:#111;padding:12px 14px;border-radius:12px;margin-top:10px;font-size:14px}
-.streamrow.hot{border-color:var(--accent);background:#1a0d08}
-.streamrow .q{font-weight:900}
-.pulse{width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;animation:pulse 1.6s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-.packet{height:3px;background:#222;border-radius:99px;overflow:hidden;margin-top:14px}
-.packet i{display:block;height:100%;width:38%;background:var(--accent);animation:slide 2.2s cubic-bezier(.65,0,.35,1) infinite}
-@keyframes slide{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
-/* marquee */
-.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:12px 0;background:var(--bg2)}
-.marquee-track{display:inline-block;animation:mq 26s linear infinite;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;font-size:20px}
-.marquee-track span{color:var(--accent);padding:0 10px}
-@keyframes mq{to{transform:translateX(-50%)}}
-/* sections — one idea per screen */
-section{padding:84px 0 10px}
-.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;border-top:2px solid var(--ink);padding-top:18px;margin-bottom:24px;flex-wrap:wrap}
-.sec-head h2{font-size:clamp(34px,5.4vw,58px);line-height:1.12;letter-spacing:-.035em;font-weight:900;text-transform:uppercase;margin:0;padding-top:.08em}
-.sec-head h2 em{font-family:"Newsreader",serif;font-style:italic;font-weight:500;text-transform:none;color:var(--accent)}
-.sec-head p{color:var(--muted);max-width:440px;margin:0;font-size:15px}
-.num{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);letter-spacing:.1em}
-/* reveal */
-.rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1)}
-.rv.in{opacity:1;transform:none}
-@media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} .rv{opacity:1;transform:none} html{scroll-behavior:auto} }
-/* pipeline */
-.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media(max-width:860px){.pipe{grid-template-columns:1fr}}
-.pstep{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;position:relative}
-.pstep .n{font-size:44px;font-weight:900;letter-spacing:-.04em;color:var(--accent);line-height:1}
-.pstep h3{margin:8px 0 6px;font-size:19px}
-.pstep p{color:var(--muted);font-size:14px;margin:0}
-.pstep.lit{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-/* simulator */
-.sim{background:#000;color:#fff;border-radius:20px;padding:22px;border:1px solid var(--line)}
-.sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-@media(max-width:860px){.sim-grid{grid-template-columns:1fr}}
-.chiprow{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
-.chipbtn{background:#111;color:#d1d5db;border:1px solid #333;border-radius:999px;padding:10px 16px;font-weight:700}
-.chipbtn[aria-pressed="true"]{background:#fff;color:#000;border-color:#fff}
-.runbtn{background:var(--accent);color:#fff;border:0;border-radius:999px;padding:14px 22px;font-weight:900;width:100%}
-.sim-out{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:#d1d5db;min-height:190px}
-.sim-out .ok{color:var(--teal)} .sim-out .warn{color:var(--accent2)}
-/* index list — providers */
-.indexlist{border-top:1px solid var(--line)}
-.irow{display:grid;grid-template-columns:64px 1fr auto;gap:16px;align-items:start;padding:22px 4px;border-bottom:1px solid var(--line)}
-@media(max-width:700px){.irow{grid-template-columns:1fr}}
-.irow .idx{font-family:"IBM Plex Mono",monospace;color:var(--muted)}
-.irow h3{font-size:clamp(28px,4vw,42px);letter-spacing:-.03em;line-height:1.12;margin:0 0 8px;font-weight:900;text-transform:uppercase}
-.irow p{color:var(--muted);margin:0;max-width:560px}
-.badge{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);padding:7px 10px;border-radius:999px;white-space:nowrap}
-.badge.live{color:var(--teal);border-color:var(--teal)} .badge.needs{color:var(--accent2);border-color:var(--accent2)}
-.specs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.spec{font-family:"IBM Plex Mono",monospace;font-size:12px;background:var(--surface);border:1px solid var(--line);padding:7px 10px;border-radius:8px}
-/* setup paths */
-.paths{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:860px){.paths{grid-template-columns:1fr}}
-.pathcard{border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--card)}
-.pathcard.featured{border-color:var(--accent);background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 8%, var(--card)),var(--card))}
-.pathcard h3{font-size:26px;letter-spacing:-.02em;margin:6px 0}
-.pathcard .time{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
-/* tabs + code */
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 12px}
-.tab{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:11px 18px;font-weight:700}
-.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px}
-.steps{list-style:none;padding:0;margin:0;counter-reset:s}
-.steps li{counter-increment:s;display:flex;gap:14px;padding:13px 0;border-bottom:1px dashed var(--line)}
-.steps li:last-child{border:0}
-.steps li::before{content:counter(s,decimal-leading-zero);font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--accent);flex:0 0 34px}
-.codebox{background:var(--code);color:var(--code-ink);border-radius:14px;padding:16px 120px 16px 16px;font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.7;overflow-wrap:anywhere;position:relative;margin-top:14px}
-.copybtn{position:absolute;top:10px;right:10px;background:#fff;color:#000;border:0;border-radius:999px;padding:8px 14px;font-weight:800;font-size:13px;min-height:36px}
-.checklist{list-style:none;padding:0;margin:14px 0 0}
-.checklist li{padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin:8px 0;display:flex;gap:10px;background:var(--card)}
-.checklist li::before{content:"✓";color:var(--teal);font-weight:900}
-/* devices */
-.devgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-@media(max-width:900px){.devgrid{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.devgrid{grid-template-columns:1fr}}
-.dev{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:18px;text-align:left;width:100%;color:var(--ink)}
-.dev[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.dev .ic{font-size:28px;display:block}
-.dev b{display:block;margin-top:8px;font-size:17px}
-.dev small{color:var(--muted)}
-.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
-@media(max-width:860px){.timeline{grid-template-columns:1fr}}
-.tl{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
-.tl .t{font-family:"IBM Plex Mono",monospace;color:var(--accent);font-size:12px;letter-spacing:.08em}
-.tl h4{margin:6px 0} .tl p{color:var(--muted);font-size:14px;margin:0}
-details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin:10px 0}
-summary{cursor:pointer;font-weight:800;padding:4px 0}
-footer{margin-top:80px;background:var(--ink);color:var(--bg);border-radius:22px 22px 0 0;padding:36px 22px 90px}
-footer h2{font-size:clamp(32px,6vw,64px);line-height:1.12;letter-spacing:-.035em;text-transform:uppercase;margin:0 0 14px}
-footer a{color:inherit}
-.notice{border:1px solid var(--accent2);border-radius:14px;padding:14px 16px;background:color-mix(in srgb,var(--accent2) 10%, transparent)}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>Direct Streams Providers — Hướng Dẫn Cài Đặt & Sử Dụng Hàng Ngày</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,600;0,800;0,900;1,600&family=Newsreader:ital,opsz,wght@1,6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a09;
+      --bg2: #121110;
+      --surface: #171614;
+      --ink: #f2efe9;
+      --muted: #9c968a;
+      --line: #2a2824;
+      --accent: #ff3b00;
+      --accent2: #ffb800;
+      --teal: #2dd4bf;
+      --card: #141311;
+      --code: #000;
+      --code-ink: #ffb800;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f4f2ec;
+        --bg2: #ece9e0;
+        --surface: #fff;
+        --ink: #11100e;
+        --muted: #6d675c;
+        --line: #ddd8cb;
+        --card: #fff;
+        --code: #11100e;
+      }
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Archivo", system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden
+    }
+
+    a {
+      color: inherit
+    }
+
+    button {
+      font: inherit;
+      min-height: 44px;
+      min-width: 44px;
+      cursor: pointer
+    }
+
+    .mono {
+      font-family: "IBM Plex Mono", monospace
+    }
+
+    .serif-i {
+      font-family: "Newsreader", serif;
+      font-style: italic;
+      font-weight: 500
+    }
+
+    /* ---------- fixed frame : four corners ---------- */
+    .frame {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px 18px
+    }
+
+    .frame-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px
+    }
+
+    .frame a,
+    .frame button {
+      pointer-events: auto
+    }
+
+    .brand {
+      font-weight: 900;
+      letter-spacing: -.03em;
+      font-size: 15px;
+      text-decoration: none;
+      line-height: 1
+    }
+
+    .brand span {
+      color: var(--accent)
+    }
+
+    .fnav {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end
+    }
+
+    .fnav a {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(8px);
+      padding: 8px 11px;
+      border-radius: 999px
+    }
+
+    .fnav a:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent)
+    }
+
+    .fmeta {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--muted)
+    }
+
+    .fmeta b {
+      color: var(--ink)
+    }
+
+    .progressline {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: var(--accent);
+      width: 0%;
+      z-index: 60
+    }
+
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px
+    }
+
+    /* ---------- hero ---------- */
+    .hero {
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 110px 0 0;
+      position: relative
+    }
+
+    .hero-kicker {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 0;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted)
+    }
+
+    .hero-kicker b {
+      color: var(--teal)
+    }
+
+    .hero h1 {
+      font-size: clamp(48px, 11vw, 138px);
+      line-height: 1.08;
+      letter-spacing: -.035em;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin: 26px 0 12px
+    }
+
+    .hero h1 .line {
+      display: block;
+      overflow: hidden;
+      padding: .14em 0 .1em;
+      margin: -.06em 0
+    }
+
+    .hero h1 .line>span {
+      display: block;
+      animation: rise .9s cubic-bezier(.22, 1, .36, 1) both
+    }
+
+    .hero h1 .line:nth-child(2)>span {
+      animation-delay: .12s
+    }
+
+    .hero h1 .line:nth-child(3)>span {
+      animation-delay: .24s
+    }
+
+    @keyframes rise {
+      from {
+        transform: translateY(115%)
+      }
+
+      to {
+        transform: translateY(0)
+      }
+    }
+
+    .hero h1 em {
+      font-family: "Newsreader", serif;
+      font-style: italic;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: -.02em;
+      color: var(--accent)
+    }
+
+    .hero-sub {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 28px;
+      align-items: start;
+      margin: 18px 0 28px
+    }
+
+    @media(max-width:820px) {
+      .hero-sub {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .hero-sub p {
+      font-size: clamp(17px, 2.2vw, 21px);
+      line-height: 1.55;
+      margin: 0;
+      max-width: 620px
+    }
+
+    .hero-sub p strong {
+      background: var(--accent);
+      color: #fff;
+      padding: 0 6px
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      font-weight: 800;
+      padding: 14px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--ink);
+      font-size: 15px
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff
+    }
+
+    .btn:hover {
+      transform: translateY(-1px)
+    }
+
+    /* TV mock — real product UI, not a photo */
+    .tv {
+      border: 1px solid var(--line);
+      background: #000;
+      color: #fff;
+      border-radius: 18px;
+      overflow: hidden
+    }
+
+    .tv-top {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid #222;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: .07em;
+      color: #9ca3af
+    }
+
+    .tv-top b {
+      color: #fff
+    }
+
+    .tv-body {
+      padding: 18px
+    }
+
+    .tv-title {
+      font-size: clamp(24px, 3.6vw, 36px);
+      font-weight: 900;
+      line-height: 1.18;
+      letter-spacing: -.03em
+    }
+
+    .tv-title em {
+      font-family: "Newsreader", serif;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--accent2)
+    }
+
+    .streamrow {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid #262626;
+      background: #111;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-top: 10px;
+      font-size: 14px
+    }
+
+    .streamrow.hot {
+      border-color: var(--accent);
+      background: #1a0d08
+    }
+
+    .streamrow .q {
+      font-weight: 900
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      display: inline-block;
+      animation: pulse 1.6s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .25
+      }
+    }
+
+    .packet {
+      height: 3px;
+      background: #222;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 14px
+    }
+
+    .packet i {
+      display: block;
+      height: 100%;
+      width: 38%;
+      background: var(--accent);
+      animation: slide 2.2s cubic-bezier(.65, 0, .35, 1) infinite
+    }
+
+    @keyframes slide {
+      0% {
+        transform: translateX(-110%)
+      }
+
+      100% {
+        transform: translateX(280%)
+      }
+    }
+
+    /* marquee */
+    .marquee {
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 12px 0;
+      background: var(--bg2)
+    }
+
+    .marquee-track {
+      display: inline-block;
+      animation: mq 26s linear infinite;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -.02em;
+      font-size: 20px
+    }
+
+    .marquee-track span {
+      color: var(--accent);
+      padding: 0 10px
+    }
+
+    @keyframes mq {
+      to {
+        transform: translateX(-50%)
+      }
+    }
+
+    /* sections — one idea per screen */
+    section {
+      padding: 84px 0 10px
+    }
+
+    .sec-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      border-top: 2px solid var(--ink);
+      padding-top: 18px;
+      margin-bottom: 24px;
+      flex-wrap: wrap
+    }
+
+    .sec-head h2 {
+      font-size: clamp(34px, 5.4vw, 58px);
+      line-height: 1.12;
+      letter-spacing: -.035em;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin: 0;
+      padding-top: .08em
+    }
+
+    .sec-head h2 em {
+      font-family: "Newsreader", serif;
+      font-style: italic;
+      font-weight: 500;
+      text-transform: none;
+      color: var(--accent)
+    }
+
+    .sec-head p {
+      color: var(--muted);
+      max-width: 440px;
+      margin: 0;
+      font-size: 15px
+    }
+
+    .num {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: .1em
+    }
+
+    /* reveal */
+    .rv {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .7s ease, transform .7s cubic-bezier(.22, 1, .36, 1)
+    }
+
+    .rv.in {
+      opacity: 1;
+      transform: none
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important
+      }
+
+      .rv {
+        opacity: 1;
+        transform: none
+      }
+
+      html {
+        scroll-behavior: auto
+      }
+    }
+
+    /* pipeline */
+    .pipe {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px
+    }
+
+    @media(max-width:860px) {
+      .pipe {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .pstep {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative
+    }
+
+    .pstep .n {
+      font-size: 44px;
+      font-weight: 900;
+      letter-spacing: -.04em;
+      color: var(--accent);
+      line-height: 1
+    }
+
+    .pstep h3 {
+      margin: 8px 0 6px;
+      font-size: 19px
+    }
+
+    .pstep p {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0
+    }
+
+    .pstep.lit {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent)
+    }
+
+    /* simulator */
+    .sim {
+      background: #000;
+      color: #fff;
+      border-radius: 20px;
+      padding: 22px;
+      border: 1px solid var(--line)
+    }
+
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px
+    }
+
+    @media(max-width:860px) {
+      .sim-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .chiprow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0 16px
+    }
+
+    .chipbtn {
+      background: #111;
+      color: #d1d5db;
+      border: 1px solid #333;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 700
+    }
+
+    .chipbtn[aria-pressed="true"] {
+      background: #fff;
+      color: #000;
+      border-color: #fff
+    }
+
+    .runbtn {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-weight: 900;
+      width: 100%
+    }
+
+    .sim-out {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      line-height: 1.9;
+      color: #d1d5db;
+      min-height: 190px
+    }
+
+    .sim-out .ok {
+      color: var(--teal)
+    }
+
+    .sim-out .warn {
+      color: var(--accent2)
+    }
+
+    /* index list — providers */
+    .indexlist {
+      border-top: 1px solid var(--line)
+    }
+
+    .irow {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 16px;
+      align-items: start;
+      padding: 22px 4px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    @media(max-width:700px) {
+      .irow {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .irow .idx {
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--muted)
+    }
+
+    .irow h3 {
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: -.03em;
+      line-height: 1.12;
+      margin: 0 0 8px;
+      font-weight: 900;
+      text-transform: uppercase
+    }
+
+    .irow p {
+      color: var(--muted);
+      margin: 0;
+      max-width: 560px
+    }
+
+    .badge {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border: 1px solid var(--line);
+      padding: 7px 10px;
+      border-radius: 999px;
+      white-space: nowrap
+    }
+
+    .badge.live {
+      color: var(--teal);
+      border-color: var(--teal)
+    }
+
+    .badge.needs {
+      color: var(--accent2);
+      border-color: var(--accent2)
+    }
+
+    .specs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px
+    }
+
+    .spec {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 7px 10px;
+      border-radius: 8px
+    }
+
+    /* setup paths */
+    .paths {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    @media(max-width:860px) {
+      .paths {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .pathcard {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      background: var(--card)
+    }
+
+    .pathcard.featured {
+      border-color: var(--accent);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, var(--card)), var(--card))
+    }
+
+    .pathcard h3 {
+      font-size: 26px;
+      letter-spacing: -.02em;
+      margin: 6px 0
+    }
+
+    .pathcard .time {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: .08em;
+      text-transform: uppercase
+    }
+
+    /* tabs + code */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 0 12px
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 11px 18px;
+      font-weight: 700
+    }
+
+    .tab[aria-selected="true"] {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink)
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px
+    }
+
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      counter-reset: s
+    }
+
+    .steps li {
+      counter-increment: s;
+      display: flex;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px dashed var(--line)
+    }
+
+    .steps li:last-child {
+      border: 0
+    }
+
+    .steps li::before {
+      content: counter(s, decimal-leading-zero);
+      font-family: "IBM Plex Mono", monospace;
+      font-weight: 700;
+      color: var(--accent);
+      flex: 0 0 34px
+    }
+
+    .codebox {
+      background: var(--code);
+      color: var(--code-ink);
+      border-radius: 14px;
+      padding: 16px 120px 16px 16px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+      position: relative;
+      margin-top: 14px
+    }
+
+    .copybtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #fff;
+      color: #000;
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: 800;
+      font-size: 13px;
+      min-height: 36px
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 14px 0 0
+    }
+
+    .checklist li {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin: 8px 0;
+      display: flex;
+      gap: 10px;
+      background: var(--card)
+    }
+
+    .checklist li::before {
+      content: "✓";
+      color: var(--teal);
+      font-weight: 900
+    }
+
+    /* devices */
+    .devgrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px
+    }
+
+    @media(max-width:900px) {
+      .devgrid {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:520px) {
+      .devgrid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .dev {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: left;
+      width: 100%;
+      color: var(--ink)
+    }
+
+    .dev[aria-pressed="true"] {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent)
+    }
+
+    .dev[aria-pressed="true"] .ic {
+      color: var(--accent)
+    }
+
+    .dev .ic {
+      display: block;
+      transition: color .2s ease
+    }
+
+    .dev .ic svg {
+      width: 28px;
+      height: 28px;
+      display: block
+    }
+
+    .dev b {
+      display: block;
+      margin-top: 8px;
+      font-size: 17px
+    }
+
+    .dev small {
+      color: var(--muted)
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 14px
+    }
+
+    @media(max-width:860px) {
+      .timeline {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .tl {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px
+    }
+
+    .tl .t {
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: .08em
+    }
+
+    .tl h4 {
+      margin: 6px 0
+    }
+
+    .tl p {
+      color: var(--muted);
+      font-size: 14px;
+      margin: 0
+    }
+
+    details {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin: 10px 0
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+      padding: 4px 0
+    }
+
+    footer {
+      margin-top: 80px;
+      background: var(--ink);
+      color: var(--bg);
+      border-radius: 22px 22px 0 0;
+      padding: 36px 22px 90px
+    }
+
+    footer h2 {
+      font-size: clamp(32px, 6vw, 64px);
+      line-height: 1.12;
+      letter-spacing: -.035em;
+      text-transform: uppercase;
+      margin: 0 0 14px
+    }
+
+    footer a {
+      color: inherit
+    }
+
+    .notice {
+      border: 1px solid var(--accent2);
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: color-mix(in srgb, var(--accent2) 10%, transparent)
+    }
+  </style>
 </head>
+
 <body>
-<div class="progressline" id="progressLine"></div>
-<div class="frame" aria-hidden="false">
-  <div class="frame-row">
-    <a class="brand" href="#top">DIRECT—STREAMS<span>.</span></a>
-    <nav class="fnav">
-      <a href="#system">Cơ chế</a><a href="#server">Cài Server</a><a href="#clients">Ứng dụng</a><a href="#daily">Dùng hàng ngày</a><a href="https://github.com/phuanh004/direct-streams-providers" target="_blank" rel="noopener">GitHub ↗</a><a href="/en" style="font-weight:700">🇺🇸 English</a>
-    </nav>
+  <div class="progressline" id="progressLine"></div>
+  <div class="frame" aria-hidden="false">
+    <div class="frame-row">
+      <a class="brand" href="#top">DIRECT—STREAMS<span>.</span></a>
+      <nav class="fnav">
+        <a href="#system">Cơ chế</a><a href="#server">Cài Server</a><a href="#clients">Ứng dụng</a><a href="#daily">Dùng
+          hàng ngày</a><a href="https://github.com/phuanh004/direct-streams-providers" target="_blank"
+          rel="noopener">GitHub ↗</a><a href="/en" style="font-weight:700">🇺🇸 English</a>
+      </nav>
+    </div>
   </div>
-</div>
 
-<div class="wrap" id="top">
-  <!-- HERO : statement / film layout -->
-  <header class="hero">
-    <div class="hero-kicker"><span>Dành cho Nuvio · WuPlay · Stremio</span><span>Không tài khoản · Không API key</span><span><b>● Đang chạy</b> — phát thẳng không qua trung gian</span></div>
-    <h1>
-      <span class="line"><span>Chọn phim.</span></span>
-      <span class="line"><span>Tự <em>bắt</em> link.</span></span>
-      <span class="line"><span>TV chiếu ngay.</span></span>
-    </h1>
-    <div class="hero-sub">
-      <div>
-        <p>Bộ công cụ gọn nhẹ biến một cú bấm chọn phim thành <strong>link MP4 / HLS trực tiếp</strong> — hỗ trợ tới 4K, sẵn phụ đề, chạy mượt ngay cả trên Android TV Box bình dân. Cài đặt một lần, dùng thoải mái mỗi ngày trên mọi thiết bị của bạn.</p>
-        <div class="hero-cta" style="margin-top:16px">
-          <a class="btn primary" href="#server">Cài đặt ngay — chỉ 60 giây →</a>
-          <a class="btn" href="#daily">Xem cách dùng hàng ngày</a>
-        </div>
-      </div>
-      <div class="tv" aria-label="Xem trước danh sách luồng phim">
-        <div class="tv-top"><span><span class="pulse"></span> NUVIO TV — ĐANG TÌM NGUỒN</span><b>TMDB 872585</b></div>
-        <div class="tv-body">
-          <div class="tv-title">Oppenheimer <em>— chọn độ phân giải</em></div>
-          <div class="streamrow hot"><span class="q">Movy · 2160p 4K HLS</span><span class="mono">11 PHỤ ĐỀ · XEM →</span></div>
-          <div class="streamrow"><span class="q">7Movies · 1080p MP4</span><span class="mono">8 PHỤ ĐỀ</span></div>
-          <div class="streamrow"><span class="q">7Movies · 720p MP4</span><span class="mono">VÀO NHANH</span></div>
-          <div class="packet"><i></i></div>
-          <p class="mono" style="font-size:11px;color:#9ca3af;margin:10px 0 0">CDN 206 Partial Content · okhttp/4.12.0 · giải mã phần cứng · không giật lag</p>
-        </div>
-      </div>
-    </div>
-  </header>
-</div>
-
-<div class="marquee" aria-hidden="true"><div class="marquee-track" id="mq">PHÁT MP4 TRỰC TIẾP <span>✦</span> CHUẨN 4K HLS <span>✦</span> KHÔNG CẦN TÀI KHOẢN <span>✦</span> SẴN PHỤ ĐỀ <span>✦</span> TÌM NGUỒN DƯỚI 9 GIÂY <span>✦</span> MƯỢT TRÊN MỌI TV BOX <span>✦</span> PHÁT MP4 TRỰC TIẾP <span>✦</span> CHUẨN 4K HLS <span>✦</span> KHÔNG CẦN TÀI KHOẢN <span>✦</span> SẴN PHỤ ĐỀ <span>✦</span> TÌM NGUỒN DƯỚI 9 GIÂY <span>✦</span> MƯỢT TRÊN MỌI TV BOX <span>✦</span></div></div>
-
-<div class="wrap">
-  <!-- SYSTEM -->
-  <section id="system">
-    <div class="sec-head rv"><div><div class="num">01 — CƠ CHẾ HOẠT ĐỘNG</div><h2>Một cú chạm,<br><em>bốn nhịp xử lý.</em></h2></div><p>Khi hiểu rõ cách hệ thống vận hành bên dưới, bạn sẽ dễ dàng làm chủ mọi tình huống mà không thấy mơ hồ.</p></div>
-    <div class="pipe rv" id="pipe">
-      <article class="pstep"><div class="n">01</div><h3>Bạn chọn phim</h3><p>Nuvio / WuPlay / Stremio chỉ gửi đi mã định danh TMDB — ví dụ <span class="mono">872585</span>. Ứng dụng không hề chứa sẵn file phim.</p></article>
-      <article class="pstep"><div class="n">02</div><h3>Scraper dò link</h3><p>7Movies hoặc Movy tự kết nối máy chủ gốc, giải mã khóa bảo mật và lưu tạm kết quả vào bộ nhớ đệm.</p></article>
-      <article class="pstep"><div class="n">03</div><h3>Đính kèm Header</h3><p><span class="mono">behaviorHints</span> báo cho ExoPlayer gửi kèm user-agent của okhttp — bí quyết giúp vượt qua lỗi chặn 428.</p></article>
-      <article class="pstep"><div class="n">04</div><h3>TV phát thẳng</h3><p>CDN trả dữ liệu trực tiếp về chip giải mã phần cứng trên TV. Không đi vòng qua bất kỳ máy chủ trung gian nào.</p></article>
-    </div>
-
-    <div class="sim" style="margin-top:14px">
-      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#fbbf24">TRẢI NGHIỆM THỬ — MÔ PHỎNG TÌM NGUỒN</div>
-      <h3 style="font-size:28px;letter-spacing:-.02em;margin:8px 0 4px">Bấm Tìm nguồn. Xem quy trình chạy thực tế.</h3>
-      <div class="sim-grid">
+  <div class="wrap" id="top">
+    <!-- HERO : statement / film layout -->
+    <header class="hero">
+      <div class="hero-kicker"><span>Dành cho Nuvio · WuPlay · Stremio</span><span>Không tài khoản · Không API
+          key</span><span><b>● Đang chạy</b> — phát thẳng không qua trung gian</span></div>
+      <h1>
+        <span class="line"><span>Chọn phim.</span></span>
+        <span class="line"><span>Tự <em>bắt</em> link.</span></span>
+        <span class="line"><span>phát trên TV.</span></span>
+      </h1>
+      <div class="hero-sub">
         <div>
-          <div class="mono" style="font-size:12px;color:#9ca3af">CHỌN PHIM</div>
-          <div class="chiprow" id="titleChips">
-            <button class="chipbtn" aria-pressed="true" data-title="Oppenheimer" data-id="872585" data-type="movie">Oppenheimer</button>
-            <button class="chipbtn" aria-pressed="false" data-title="Breaking Bad S01E01" data-id="1396" data-type="tv">Breaking Bad S01E01</button>
-            <button class="chipbtn" aria-pressed="false" data-title="Dune: Part Two" data-id="693134" data-type="movie">Dune: Part Two</button>
+          <p>Bộ công cụ gọn nhẹ biến một cú bấm chọn phim thành <strong>link MP4 / HLS trực tiếp</strong> — hỗ trợ tới
+            4K, sẵn phụ đề, chạy mượt ngay cả trên Android TV Box bình dân. Cài đặt một lần, dùng thoải mái mỗi ngày
+            trên mọi thiết bị của bạn.</p>
+          <div class="hero-cta" style="margin-top:16px">
+            <a class="btn primary" href="#server">Cài đặt ngay — chỉ 60 giây →</a>
+            <a class="btn" href="#daily">Xem cách dùng hàng ngày</a>
           </div>
-          <div class="mono" style="font-size:12px;color:#9ca3af">NGUỒN PHÁT (PROVIDER)</div>
-          <div class="chiprow" id="provChips">
-            <button class="chipbtn" aria-pressed="true" data-prov="Movy">Movy — 4K</button>
-            <button class="chipbtn" aria-pressed="false" data-prov="7Movies">7Movies — MP4</button>
-          </div>
-          <button class="runbtn" id="runSim">▶ Tìm nguồn phát</button>
-          <p style="color:#9ca3af;font-size:13px">Dữ liệu mô phỏng lấy từ kết quả kiểm thử thật — tập phim Breaking Bad S01E01 trả về 4 luồng phát kèm 8 bản phụ đề.</p>
         </div>
-        <div class="sim-out" id="simOut">Đã sẵn sàng. Chọn một bộ phim rồi bấm Tìm nguồn phát.<br><span style="color:#6b7280">// nhật ký xử lý từng bước sẽ hiện ở đây</span></div>
+        <div class="tv" aria-label="Xem trước danh sách luồng phim">
+          <div class="tv-top"><span><span class="pulse"></span> NUVIO TV — ĐANG TÌM NGUỒN</span><b>TMDB 872585</b></div>
+          <div class="tv-body">
+            <div class="tv-title">Oppenheimer <em>— chọn độ phân giải</em></div>
+            <div class="streamrow hot"><span class="q">Movy · 2160p 4K HLS</span><span class="mono">11 PHỤ ĐỀ · XEM
+                →</span></div>
+            <div class="streamrow"><span class="q">7Movies · 1080p MP4</span><span class="mono">8 PHỤ ĐỀ</span></div>
+            <div class="streamrow"><span class="q">7Movies · 720p MP4</span><span class="mono">VÀO NHANH</span></div>
+            <div class="packet"><i></i></div>
+            <p class="mono" style="font-size:11px;color:#9ca3af;margin:10px 0 0">CDN 206 Partial Content · okhttp/4.12.0
+              · giải mã phần cứng · không giật lag</p>
+          </div>
+        </div>
       </div>
+    </header>
+  </div>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="mq">PHÁT MP4 TRỰC TIẾP <span>✦</span> CHUẨN 4K HLS <span>✦</span> KHÔNG CẦN TÀI KHOẢN
+      <span>✦</span> SẴN PHỤ ĐỀ <span>✦</span> TÌM NGUỒN DƯỚI 9 GIÂY <span>✦</span> MƯỢT TRÊN MỌI TV BOX <span>✦</span>
+      PHÁT MP4 TRỰC TIẾP <span>✦</span> CHUẨN 4K HLS <span>✦</span> KHÔNG CẦN TÀI KHOẢN <span>✦</span> SẴN PHỤ ĐỀ
+      <span>✦</span> TÌM NGUỒN DƯỚI 9 GIÂY <span>✦</span> MƯỢT TRÊN MỌI TV BOX <span>✦</span>
     </div>
-  </section>
+  </div>
 
-  <!-- PROVIDERS : index style -->
-  <section>
-    <div class="sec-head rv"><div><div class="num">02 — CÁC NGUỒN PHÁT</div><h2>Ba chìa khóa,<br><em>mở chung một cửa.</em></h2></div><p>Nhìn bên ngoài thì giống nhau, nhưng mỗi nguồn lại có thế mạnh riêng. Hãy xem nhãn trạng thái để chọn đúng nguồn bạn cần.</p></div>
-    <div class="indexlist rv">
-      <article class="irow"><div class="idx">/ 01</div><div><h3>7Movies</h3><p>Khai thác nguồn 7movies.ac qua VidLink. Cực kỳ ổn định với định dạng MP4 — lựa chọn hàng đầu khi bạn chỉ cần bấm là xem ngay, ít kén mạng.</p><div class="specs"><span class="spec">MP4 360p–1080p</span><span class="spec">Tích hợp sẵn phụ đề</span><span class="spec">Tự giãn nhịp khi gặp 429 / 492</span><span class="spec">Lưu cache hash 10 phút</span></div></div><span class="badge live">● Chạy ổn định</span></article>
-      <article class="irow"><div class="idx">/ 02</div><div><h3>Movy</h3><p>Khai thác movy.sx qua api.wecollege.net. Vua về chất lượng hình ảnh — nguồn duy nhất đạt chuẩn 4K sắc nét và tìm được nhiều phim hiếm nhờ hệ thống server dự phòng.</p><div class="specs"><span class="spec">HLS lên tới 2160p</span><span class="spec">Xác thực seed mvm1</span><span class="spec">13 server · quét cuốn chiếu 3 luồng</span><span class="spec">Ưu tiên Miami + Boise</span></div></div><span class="badge live">● Hoạt động · 4K</span></article>
-      <article class="irow"><div class="idx">/ 03</div><div><h3>FlyStream</h3><p>Lấy luồng từ <span class="mono">/api/streams</span> của flystream.net — chia rõ từng mức chất lượng kèm chế độ Auto. Rất mạnh, nhưng bắt buộc phải bật server phụ trợ riêng (xem Cách B bên dưới).</p><div class="specs"><span class="spec">HLS + tùy chọn Auto</span><span class="spec">Tự đổi mã TMDB → IMDb</span><span class="spec">Cần chạy server.js ở cổng :7070</span></div></div><span class="badge needs">◐ Cần server phụ trợ</span></article>
-    </div>
-  </section>
+  <div class="wrap">
+    <!-- SYSTEM -->
+    <section id="system">
+      <div class="sec-head rv">
+        <div>
+          <div class="num">01 — CƠ CHẾ HOẠT ĐỘNG</div>
+          <h2>Một cú chạm,<br><em>bốn nhịp xử lý.</em></h2>
+        </div>
+        <p>Khi hiểu rõ cách hệ thống vận hành bên dưới, bạn sẽ dễ dàng làm chủ mọi tình huống mà không thấy mơ hồ.</p>
+      </div>
+      <div class="pipe rv" id="pipe">
+        <article class="pstep">
+          <div class="n">01</div>
+          <h3>Bạn chọn phim</h3>
+          <p>Nuvio / WuPlay / Stremio chỉ gửi đi mã định danh TMDB — ví dụ <span class="mono">872585</span>. Ứng dụng
+            không hề chứa sẵn file phim.</p>
+        </article>
+        <article class="pstep">
+          <div class="n">02</div>
+          <h3>Scraper dò link</h3>
+          <p>7Movies hoặc Movy tự kết nối máy chủ gốc, giải mã khóa bảo mật và lưu tạm kết quả vào bộ nhớ đệm.</p>
+        </article>
+        <article class="pstep">
+          <div class="n">03</div>
+          <h3>Đính kèm Header</h3>
+          <p><span class="mono">behaviorHints</span> báo cho ExoPlayer gửi kèm user-agent của okhttp — bí quyết giúp
+            vượt qua lỗi chặn 428.</p>
+        </article>
+        <article class="pstep">
+          <div class="n">04</div>
+          <h3>TV phát thẳng</h3>
+          <p>CDN trả dữ liệu trực tiếp về chip giải mã phần cứng trên TV. Không đi vòng qua bất kỳ máy chủ trung gian
+            nào.</p>
+        </article>
+      </div>
 
-  <!-- SERVER SETUP -->
-  <section id="server">
-    <div class="sec-head rv"><div><div class="num">03 — CÀI ĐẶT SERVER</div><h2>Thiết lập<br><em>hệ thống nguồn.</em></h2></div><p>Có 2 cách cài đặt tùy nhu cầu. Hầu hết mọi người chỉ cần Cách A là đủ. Cách B dành cho ai muốn mở khóa thêm FlyStream hoặc dùng chung cho WuPlay / Stremio.</p></div>
+      <div class="sim" style="margin-top:14px">
+        <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#fbbf24">TRẢI NGHIỆM THỬ — MÔ PHỎNG TÌM NGUỒN
+        </div>
+        <h3 style="font-size:28px;letter-spacing:-.02em;margin:8px 0 4px">Bấm Tìm nguồn. Xem quy trình chạy thực tế.
+        </h3>
+        <div class="sim-grid">
+          <div>
+            <div class="mono" style="font-size:12px;color:#9ca3af">CHỌN PHIM</div>
+            <div class="chiprow" id="titleChips">
+              <button class="chipbtn" aria-pressed="true" data-title="Oppenheimer" data-id="872585"
+                data-type="movie">Oppenheimer</button>
+              <button class="chipbtn" aria-pressed="false" data-title="Breaking Bad S01E01" data-id="1396"
+                data-type="tv">Breaking Bad S01E01</button>
+              <button class="chipbtn" aria-pressed="false" data-title="Dune: Part Two" data-id="693134"
+                data-type="movie">Dune: Part Two</button>
+            </div>
+            <div class="mono" style="font-size:12px;color:#9ca3af">NGUỒN PHÁT (PROVIDER)</div>
+            <div class="chiprow" id="provChips">
+              <button class="chipbtn" aria-pressed="true" data-prov="Movy">Movy — 4K</button>
+              <button class="chipbtn" aria-pressed="false" data-prov="7Movies">7Movies — MP4</button>
+            </div>
+            <button class="runbtn" id="runSim">▶ Tìm nguồn phát</button>
+            <p style="color:#9ca3af;font-size:13px">Dữ liệu mô phỏng lấy từ kết quả kiểm thử thật — tập phim Breaking
+              Bad S01E01 trả về 4 luồng phát kèm 8 bản phụ đề.</p>
+          </div>
+          <div class="sim-out" id="simOut">Đã sẵn sàng. Chọn một bộ phim rồi bấm Tìm nguồn phát.<br><span
+              style="color:#6b7280">// nhật ký xử lý từng bước sẽ hiện ở đây</span></div>
+        </div>
+      </div>
+    </section>
 
-    <div class="paths rv">
-      <article class="pathcard featured">
-        <div class="time">Cách A · ~60 giây · Khuyên dùng</div>
-        <h3>Không cần server — dùng trực tiếp link GitHub</h3>
-        <p style="color:var(--muted)">7Movies và Movy chạy như tiện ích mở rộng <em>ngay bên trong</em> ứng dụng xem phim trên TV. Bạn không cần cài đặt hay treo máy chủ gì cả. Chỉ cần dán một đường link vào Nuvio là tự động đồng bộ lên TV.</p>
+    <!-- PROVIDERS : index style -->
+    <section>
+      <div class="sec-head rv">
+        <div>
+          <div class="num">02 — CÁC NGUỒN PHÁT</div>
+          <h2>Ba nguồn phát,<br><em>mạnh nhất hiện nay.</em></h2>
+        </div>
+        <p>Mỗi nguồn lại có thế mạnh riêng. Hãy xem thêm thông tin hoặc tự trải
+          nghiệm các trang web này để chọn đúng nguồn bạn cần.</p>
+      </div>
+      <div class="indexlist rv">
+        <article class="irow">
+          <div class="idx">/ 01</div>
+          <div>
+            <h3>7Movies</h3>
+            <p>Khai thác nguồn 7movies.ac qua VidLink. Cực kỳ ổn định với định dạng MP4 — lựa chọn hàng đầu khi bạn chỉ
+              cần bấm là xem ngay, ít kén mạng.</p>
+            <div class="specs"><span class="spec">MP4 360p–1080p</span><span class="spec">Tích hợp sẵn phụ
+                đề</span><span class="spec">Tự giãn nhịp khi gặp 429 / 492</span><span class="spec">Lưu cache hash 10
+                phút</span></div>
+          </div><span class="badge live">● Chạy ổn định</span>
+        </article>
+        <article class="irow">
+          <div class="idx">/ 02</div>
+          <div>
+            <h3>Movy</h3>
+            <p>Khai thác movy.sx qua api.wecollege.net. Vua về chất lượng hình ảnh — nguồn duy nhất đạt chuẩn 4K sắc nét
+              và tìm được nhiều phim hiếm nhờ hệ thống server dự phòng.</p>
+            <div class="specs"><span class="spec">HLS lên tới 2160p</span><span class="spec">Xác thực seed
+                mvm1</span><span class="spec">13 server · quét cuốn chiếu 3 luồng</span><span class="spec">Ưu tiên Miami
+                + Boise</span></div>
+          </div><span class="badge live">● Hoạt động · 4K</span>
+        </article>
+        <article class="irow">
+          <div class="idx">/ 03</div>
+          <div>
+            <h3>FlyStream</h3>
+            <p>Lấy luồng từ <span class="mono">/api/streams</span> của flystream.net — chia rõ từng mức chất lượng kèm
+              chế độ Auto. Rất mạnh, nhưng bắt buộc phải bật server phụ trợ riêng (xem Cách B bên dưới).</p>
+            <div class="specs"><span class="spec">HLS + tùy chọn Auto</span><span class="spec">Tự đổi mã TMDB →
+                IMDb</span><span class="spec">Cần chạy server.js ở cổng :7070</span></div>
+          </div><span class="badge needs">◐ Cần server phụ trợ</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- SERVER SETUP -->
+    <section id="server">
+      <div class="sec-head rv">
+        <div>
+          <div class="num">03 — CÀI ĐẶT SERVER</div>
+          <h2>Thiết lập<br><em>hệ thống nguồn.</em></h2>
+        </div>
+        <p>Có 2 cách cài đặt tùy nhu cầu. Hầu hết mọi người chỉ cần Cách A là đủ. Cách B dành cho ai muốn mở khóa thêm
+          FlyStream hoặc dùng chung cho WuPlay / Stremio.</p>
+      </div>
+
+      <div class="paths rv">
+        <article class="pathcard featured">
+          <div class="time">Cách A · ~60 giây · Khuyên dùng</div>
+          <h3>Không cần server — dùng trực tiếp link GitHub</h3>
+          <p style="color:var(--muted)">7Movies và Movy chạy như tiện ích mở rộng <em>ngay bên trong</em> ứng dụng xem
+            phim trên TV. Bạn không cần cài đặt hay treo máy chủ gì cả. Chỉ cần dán một đường link vào Nuvio là tự động
+            đồng bộ lên TV.</p>
+          <ol class="steps">
+            <li>
+              <div>Trên điện thoại hoặc máy tính, truy cập <a href="https://nuvioapp.space/account" target="_blank"
+                  rel="noopener"><strong>nuvioapp.space/account</strong></a> → đăng nhập → chọn <strong>Plugins → Add
+                  plugin</strong>.</div>
+            </li>
+            <li>
+              <div>Dán đường dẫn manifest bên dưới rồi bấm Lưu (Save). Mở TV lên kiểm tra: thấy hiện tên các nguồn phát
+                là thành công.</div>
+            </li>
+            <li>
+              <div>Trên TV, vào <strong>Settings → Content &amp; Discovery → Plugins</strong> và gạt BẬT mục
+                <strong>“Enable plugin providers globally”</strong> (lưu ý phải dùng bản Nuvio cài file APK ngoài, bản
+                trên CH Play bị khóa tính năng này).
+              </div>
+            </li>
+          </ol>
+          <div class="codebox">
+            https://raw.githubusercontent.com/phuanh004/direct-streams-providers/refs/heads/main/manifest.json<button
+              class="copybtn"
+              data-copy="https://raw.githubusercontent.com/phuanh004/direct-streams-providers/refs/heads/main/manifest.json">Sao
+              chép</button></div>
+        </article>
+
+        <article class="pathcard">
+          <div class="time">Cách B · ~10 phút · Mở khóa FlyStream &amp; tự host</div>
+          <h3>Server phụ trợ — chạy <span class="mono">server.js</span></h3>
+          <p style="color:var(--muted)">Một dịch vụ Node.js siêu nhẹ chạy ở cổng <strong>7070</strong>, không cần cài
+            thêm thư viện rườm rà. Nó giúp cấp manifest nội bộ và xử lý cookie vượt rào cho FlyStream. Bạn có thể chạy
+            trên Raspberry Pi, máy tính bật sẵn ở nhà hoặc đưa lên cloud.</p>
+          <ul class="checklist">
+            <li>Cài sẵn Node.js 18 trở lên (đã chạy tốt tới Node 26)</li>
+            <li>Dùng chung Wi-Fi với TV nếu chạy mạng nội bộ — nên dùng tên miền <span class="mono">.local</span> thay
+              vì số IP dễ bị đổi</li>
+            <li>Giữ cửa sổ server chạy ngầm trong suốt lúc xem nguồn FlyStream</li>
+          </ul>
+          <div class="codebox">git clone https://github.com/phuanh004/direct-streams-providers.git<br>cd
+            direct-streams-providers<br>npm install &nbsp;# esbuild<br>npm run build<br>npm run serve &nbsp;# →
+            :7070<button class="copybtn"
+              data-copy="git clone https://github.com/phuanh004/direct-streams-providers.git">Chép lệnh</button></div>
+        </article>
+      </div>
+
+      <div class="tabs rv" role="tablist" aria-label="Chọn nơi đặt server phụ trợ">
+        <button class="tab" role="tab" aria-selected="true" data-stab="lan">🏠 Pi / PC tại nhà (LAN)</button>
+        <button class="tab" role="tab" aria-selected="false" data-stab="cf">☁️ Cloudflare Workers</button>
+        <button class="tab" role="tab" aria-selected="false" data-stab="vercel">▲ Vercel</button>
+        <button class="tab" role="tab" aria-selected="false" data-stab="test">✓ Kiểm tra hoạt động</button>
+      </div>
+      <div class="panel rv" id="spanel-lan">
         <ol class="steps">
-          <li><div>Trên điện thoại hoặc máy tính, truy cập <a href="https://nuvioapp.space/account" target="_blank" rel="noopener"><strong>nuvioapp.space/account</strong></a> → đăng nhập → chọn <strong>Plugins → Add plugin</strong>.</div></li>
-          <li><div>Dán đường dẫn manifest bên dưới rồi bấm Lưu (Save). Mở TV lên kiểm tra: thấy hiện tên các nguồn phát là thành công.</div></li>
-          <li><div>Trên TV, vào <strong>Settings → Content &amp; Discovery → Plugins</strong> và gạt BẬT mục <strong>“Enable plugin providers globally”</strong> (lưu ý phải dùng bản Nuvio cài file APK ngoài, bản trên CH Play bị khóa tính năng này).</div></li>
+          <li>
+            <div><strong>Khởi chạy server</strong> trên Pi hoặc máy tính bằng bộ lệnh ở Cách B. Giữ terminal luôn mở
+              (hoặc cho chạy ngầm qua pm2 / systemd).</div>
+          </li>
+          <li>
+            <div><strong>Xem tên miền <span class="mono">.local</span> của máy</strong> — ví dụ <span
+                class="mono">raspberrypi.local</span> hoặc tên máy tính trong mạng LAN. Cách này giúp link không bao giờ
+              bị chết khi modem đổi địa chỉ IP.</div>
+          </li>
+          <li>
+            <div><strong>Dán link manifest này vào ứng dụng xem phim</strong>. Tất cả thiết bị trong nhà dùng chung
+              Wi-Fi đều dùng chung một link duy nhất.</div>
+          </li>
         </ol>
-        <div class="codebox">https://raw.githubusercontent.com/phuanh004/direct-streams-providers/refs/heads/main/manifest.json<button class="copybtn" data-copy="https://raw.githubusercontent.com/phuanh004/direct-streams-providers/refs/heads/main/manifest.json">Sao chép</button></div>
-      </article>
+        <div class="codebox">http://&lt;ten-may-chu&gt;.local:7070/manifest.json<button class="copybtn"
+            data-copy="http://<ten-may-chu>.local:7070/manifest.json">Sao chép</button></div>
+      </div>
+      <div class="panel rv" id="spanel-cf" hidden>
+        <ol class="steps">
+          <li>
+            <div>Đưa tệp <span class="mono">worker.js</span> kèm cấu hình <span class="mono">wrangler.toml</span> trong
+              repo lên Cloudflare Workers — chạy hoàn toàn trên đám mây mà không cần bật máy tính ở nhà.</div>
+          </li>
+          <li>
+            <div>Lấy địa chỉ Workers được cấp làm đường dẫn manifest, dạng <span
+                class="mono">https://&lt;ten-worker&gt;.&lt;tai-khoan&gt;.workers.dev/manifest.json</span>.</div>
+          </li>
+          <li>
+            <div>Giải pháp lý tưởng nếu bạn hay mang TV Box đi xa hoặc không muốn nuôi một thiết bị chạy 24/7 tại nhà.
+            </div>
+          </li>
+        </ol>
+      </div>
+      <div class="panel rv" id="spanel-vercel" hidden>
+        <ol class="steps">
+          <li>
+            <div>Kết nối repo vào Vercel — hệ thống sẽ tự nhận diện <span class="mono">server.js</span> để chạy như một
+              server add-on hoàn chỉnh.</div>
+          </li>
+          <li>
+            <div>Ghép tên miền Vercel được cấp với đuôi <span class="mono">/manifest.json</span> rồi thêm vào Nuvio,
+              WuPlay hoặc Stremio.</div>
+          </li>
+          <li>
+            <div>Mỗi khi repo có bản cập nhật mới, chỉ cần bấm re-deploy trên Vercel để làm mới bộ nguồn.</div>
+          </li>
+        </ol>
+      </div>
+      <div class="panel rv" id="spanel-test" hidden>
+        <p style="margin-top:0">Nên chạy bài kiểm tra ngoại tuyến trước (không tốn băng thông, không làm quá tải máy chủ
+          nguồn), sau đó mới thử kết nối thực tế:</p>
+        <div class="codebox">npm run test:offline &nbsp;# kiểm tra nội bộ + router + flystream + movy<br>npm test
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# kiểm tra mạng thực tế — hạn chế chạy
+          liên tục<button class="copybtn" data-copy="npm run test:offline">Sao chép</button></div>
+        <p style="color:var(--muted)">Nếu hệ thống khỏe mạnh, kết quả sẽ báo: Oppenheimer (872585) → 1 luồng · Breaking
+          Bad S01E01 (1396) → 4 luồng (1080p–360p), 8 bản phụ đề.</p>
+      </div>
+      <div class="notice rv" style="margin-top:14px"><strong>Lưu ý quan trọng:</strong> Nguồn FlyStream sẽ không hiện
+        phim nào nếu bạn dùng link manifest trực tiếp từ GitHub. Nó chỉ hoạt động qua Cách B vì server phụ trợ cần tự
+        chèn địa chỉ kết nối vào tệp <span class="mono">providers/flystream.js</span>.</div>
+    </section>
 
-      <article class="pathcard">
-        <div class="time">Cách B · ~10 phút · Mở khóa FlyStream &amp; tự host</div>
-        <h3>Server phụ trợ — chạy <span class="mono">server.js</span></h3>
-        <p style="color:var(--muted)">Một dịch vụ Node.js siêu nhẹ chạy ở cổng <strong>7070</strong>, không cần cài thêm thư viện rườm rà. Nó giúp cấp manifest nội bộ và xử lý cookie vượt rào cho FlyStream. Bạn có thể chạy trên Raspberry Pi, máy tính bật sẵn ở nhà hoặc đưa lên cloud.</p>
-        <ul class="checklist">
-          <li>Cài sẵn Node.js 18 trở lên (đã chạy tốt tới Node 26)</li>
-          <li>Dùng chung Wi-Fi với TV nếu chạy mạng nội bộ — nên dùng tên miền <span class="mono">.local</span> thay vì số IP dễ bị đổi</li>
-          <li>Giữ cửa sổ server chạy ngầm trong suốt lúc xem nguồn FlyStream</li>
-        </ul>
-        <div class="codebox">git clone https://github.com/phuanh004/direct-streams-providers.git<br>cd direct-streams-providers<br>npm install &nbsp;# esbuild<br>npm run build<br>npm run serve &nbsp;# → :7070<button class="copybtn" data-copy="git clone https://github.com/phuanh004/direct-streams-providers.git">Chép lệnh</button></div>
-      </article>
-    </div>
+    <!-- CLIENTS -->
+    <section id="clients">
+      <div class="sec-head rv">
+        <div>
+          <div class="num">04 — CÀI TRÊN ỨNG DỤNG</div>
+          <h2>Thêm nguồn vào<br><em>từng ứng dụng.</em></h2>
+        </div>
+        <p>Cùng một hệ thống nguồn phim, hỗ trợ 3 nền tảng phổ biến. Sau khi xong bước server, hãy chọn ứng dụng bạn
+          đang dùng để xem hướng dẫn.</p>
+      </div>
+      <div class="tabs rv" role="tablist" aria-label="Chọn ứng dụng xem phim">
+        <button class="tab" role="tab" aria-selected="true" data-ctab="nuvio">📺 Nuvio — Android TV</button>
+        <button class="tab" role="tab" aria-selected="false" data-ctab="wuplay">WuPlay</button>
+        <button class="tab" role="tab" aria-selected="false" data-ctab="stremio">Stremio</button>
+      </div>
+      <div class="panel rv" id="cpanel-nuvio">
+        <ol class="steps">
+          <li>
+            <div><strong>Cài bản Nuvio APK tải ngoài</strong> lên TV (bản tải trên Google Play Store đã bị gỡ bỏ phần
+              plugin theo quy định của Google).</div>
+          </li>
+          <li>
+            <div><strong>Thêm plugin bằng điện thoại</strong> như hướng dẫn ở Cách A. Mọi thứ tự động đồng bộ sang TV
+              trong tích tắc, đỡ tốn công bấm điều khiển gõ từng chữ.</div>
+          </li>
+          <li>
+            <div><strong>Hoặc nhập trực tiếp trên TV:</strong> vào Settings → Content &amp; Discovery → Plugins → chọn
+              quét mã QR bằng điện thoại, hoặc dán link vào mục “URL or short code” → + Add. Cuối cùng nhớ gạt BẬT
+              “Enable plugin providers globally”.</div>
+          </li>
+        </ol>
+      </div>
+      <div class="panel rv" id="cpanel-wuplay" hidden>
+        <ol class="steps">
+          <li>
+            <div><strong>Bật server phụ trợ</strong> (Cách B) bằng lệnh <span class="mono">npm run serve</span> ở cổng
+              :7070.</div>
+          </li>
+          <li>
+            <div><strong>Mở trang cấu hình WuPlay:</strong> trên TV vào Settings → Configuration rồi quét mã QR để mở <a
+                href="https://config.wuplay.app" target="_blank" rel="noopener">config.wuplay.app</a> — WuPlay lưu cấu
+              hình trên tài khoản đám mây nên chỉ cần thêm một lần là tự đồng bộ sang mọi thiết bị khác.</div>
+          </li>
+          <li>
+            <div><strong>Dán đường dẫn manifest</strong> theo định dạng <span class="mono">.local</span> dưới đây.</div>
+          </li>
+        </ol>
+        <div class="codebox">http://&lt;ten-may-chu&gt;.local:7070/manifest.json<button class="copybtn"
+            data-copy="http://<ten-may-chu>.local:7070/manifest.json">Sao chép</button></div>
+      </div>
+      <div class="panel rv" id="cpanel-stremio" hidden>
+        <ol class="steps">
+          <li>
+            <div><strong>Bật server phụ trợ</strong> (Cách B) chạy ở cổng :7070.</div>
+          </li>
+          <li>
+            <div><strong>Dán thẳng link manifest vào ô tìm kiếm của Stremio</strong>, hoặc mở bằng đường dẫn <span
+                class="mono">stremio://</span>.</div>
+          </li>
+          <li>
+            <div><strong>Kiểm tra lại:</strong> tiện ích sẽ xuất hiện trong mục Add-ons đã cài, và khi bấm vào bất kỳ bộ
+              phim nào bạn sẽ thấy thêm các dòng nguồn phát mới.</div>
+          </li>
+        </ol>
+        <p style="color:var(--muted)">Ưu tiên dùng tên miền <span class="mono">.local</span> để Stremio luôn kết nối ổn
+          định kể cả khi modem Wi-Fi khởi động lại và đổi IP.</p>
+        <div class="codebox">
+          http://&lt;ten-may-chu&gt;.local:7070/manifest.json<br>stremio://&lt;ten-may-chu&gt;.local:7070/manifest.json<button
+            class="copybtn" data-copy="http://<ten-may-chu>.local:7070/manifest.json">Sao chép</button></div>
+      </div>
+    </section>
 
-    <div class="tabs rv" role="tablist" aria-label="Chọn nơi đặt server phụ trợ">
-      <button class="tab" role="tab" aria-selected="true" data-stab="lan">🏠 Pi / PC tại nhà (LAN)</button>
-      <button class="tab" role="tab" aria-selected="false" data-stab="cf">☁️ Cloudflare Workers</button>
-      <button class="tab" role="tab" aria-selected="false" data-stab="vercel">▲ Vercel</button>
-      <button class="tab" role="tab" aria-selected="false" data-stab="test">✓ Kiểm tra hoạt động</button>
-    </div>
-    <div class="panel rv" id="spanel-lan">
-      <ol class="steps">
-        <li><div><strong>Khởi chạy server</strong> trên Pi hoặc máy tính bằng bộ lệnh ở Cách B. Giữ terminal luôn mở (hoặc cho chạy ngầm qua pm2 / systemd).</div></li>
-        <li><div><strong>Xem tên miền <span class="mono">.local</span> của máy</strong> — ví dụ <span class="mono">raspberrypi.local</span> hoặc tên máy tính trong mạng LAN. Cách này giúp link không bao giờ bị chết khi modem đổi địa chỉ IP.</div></li>
-        <li><div><strong>Dán link manifest này vào ứng dụng xem phim</strong>. Tất cả thiết bị trong nhà dùng chung Wi-Fi đều dùng chung một link duy nhất.</div></li>
-      </ol>
-      <div class="codebox">http://&lt;ten-may-chu&gt;.local:7070/manifest.json<button class="copybtn" data-copy="http://<ten-may-chu>.local:7070/manifest.json">Sao chép</button></div>
-    </div>
-    <div class="panel rv" id="spanel-cf" hidden>
-      <ol class="steps">
-        <li><div>Đưa tệp <span class="mono">worker.js</span> kèm cấu hình <span class="mono">wrangler.toml</span> trong repo lên Cloudflare Workers — chạy hoàn toàn trên đám mây mà không cần bật máy tính ở nhà.</div></li>
-        <li><div>Lấy địa chỉ Workers được cấp làm đường dẫn manifest, dạng <span class="mono">https://&lt;ten-worker&gt;.&lt;tai-khoan&gt;.workers.dev/manifest.json</span>.</div></li>
-        <li><div>Giải pháp lý tưởng nếu bạn hay mang TV Box đi xa hoặc không muốn nuôi một thiết bị chạy 24/7 tại nhà.</div></li>
-      </ol>
-    </div>
-    <div class="panel rv" id="spanel-vercel" hidden>
-      <ol class="steps">
-        <li><div>Kết nối repo vào Vercel — hệ thống sẽ tự nhận diện <span class="mono">server.js</span> để chạy như một server add-on hoàn chỉnh.</div></li>
-        <li><div>Ghép tên miền Vercel được cấp với đuôi <span class="mono">/manifest.json</span> rồi thêm vào Nuvio, WuPlay hoặc Stremio.</div></li>
-        <li><div>Mỗi khi repo có bản cập nhật mới, chỉ cần bấm re-deploy trên Vercel để làm mới bộ nguồn.</div></li>
-      </ol>
-    </div>
-    <div class="panel rv" id="spanel-test" hidden>
-      <p style="margin-top:0">Nên chạy bài kiểm tra ngoại tuyến trước (không tốn băng thông, không làm quá tải máy chủ nguồn), sau đó mới thử kết nối thực tế:</p>
-      <div class="codebox">npm run test:offline &nbsp;# kiểm tra nội bộ + router + flystream + movy<br>npm test &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# kiểm tra mạng thực tế — hạn chế chạy liên tục<button class="copybtn" data-copy="npm run test:offline">Sao chép</button></div>
-      <p style="color:var(--muted)">Nếu hệ thống khỏe mạnh, kết quả sẽ báo: Oppenheimer (872585) → 1 luồng · Breaking Bad S01E01 (1396) → 4 luồng (1080p–360p), 8 bản phụ đề.</p>
-    </div>
-    <div class="notice rv" style="margin-top:14px"><strong>Lưu ý quan trọng:</strong> Nguồn FlyStream sẽ không hiện phim nào nếu bạn dùng link manifest trực tiếp từ GitHub. Nó chỉ hoạt động qua Cách B vì server phụ trợ cần tự chèn địa chỉ kết nối vào tệp <span class="mono">providers/flystream.js</span>.</div>
-  </section>
+    <!-- DAILY USE -->
+    <section id="daily">
+      <div class="sec-head rv">
+        <div>
+          <div class="num">05 — SỬ DỤNG HÀNG NGÀY</div>
+          <h2>Thoải mái xem phim,<br><em>trên mọi màn hình.</em></h2>
+        </div>
+        <p>Cài đặt chỉ tốn vài phút ban đầu, còn đây là trải nghiệm dùng hàng ngày. Chạm vào từng thiết bị để xem cách
+          tận dụng hiệu quả nhất.</p>
+      </div>
 
-  <!-- CLIENTS -->
-  <section id="clients">
-    <div class="sec-head rv"><div><div class="num">04 — CÀI TRÊN ỨNG DỤNG</div><h2>Thêm nguồn vào<br><em>từng ứng dụng.</em></h2></div><p>Cùng một hệ thống nguồn phim, hỗ trợ 3 nền tảng phổ biến. Sau khi xong bước server, hãy chọn ứng dụng bạn đang dùng để xem hướng dẫn.</p></div>
-    <div class="tabs rv" role="tablist" aria-label="Chọn ứng dụng xem phim">
-      <button class="tab" role="tab" aria-selected="true" data-ctab="nuvio">📺 Nuvio — Android TV</button>
-      <button class="tab" role="tab" aria-selected="false" data-ctab="wuplay">WuPlay</button>
-      <button class="tab" role="tab" aria-selected="false" data-ctab="stremio">Stremio</button>
-    </div>
-    <div class="panel rv" id="cpanel-nuvio">
-      <ol class="steps">
-        <li><div><strong>Cài bản Nuvio APK tải ngoài</strong> lên TV (bản tải trên Google Play Store đã bị gỡ bỏ phần plugin theo quy định của Google).</div></li>
-        <li><div><strong>Thêm plugin bằng điện thoại</strong> như hướng dẫn ở Cách A. Mọi thứ tự động đồng bộ sang TV trong tích tắc, đỡ tốn công bấm điều khiển gõ từng chữ.</div></li>
-        <li><div><strong>Hoặc nhập trực tiếp trên TV:</strong> vào Settings → Content &amp; Discovery → Plugins → chọn quét mã QR bằng điện thoại, hoặc dán link vào mục “URL or short code” → + Add. Cuối cùng nhớ gạt BẬT “Enable plugin providers globally”.</div></li>
-      </ol>
-    </div>
-    <div class="panel rv" id="cpanel-wuplay" hidden>
-      <ol class="steps">
-        <li><div><strong>Bật server phụ trợ</strong> (Cách B) bằng lệnh <span class="mono">npm run serve</span> ở cổng :7070.</div></li>
-        <li><div><strong>Mở trang cấu hình WuPlay:</strong> trên TV vào Settings → Configuration rồi quét mã QR để mở <a href="https://config.wuplay.app" target="_blank" rel="noopener">config.wuplay.app</a> — WuPlay lưu cấu hình trên tài khoản đám mây nên chỉ cần thêm một lần là tự đồng bộ sang mọi thiết bị khác.</div></li>
-        <li><div><strong>Dán đường dẫn manifest</strong> theo định dạng <span class="mono">.local</span> dưới đây.</div></li>
-      </ol>
-      <div class="codebox">http://&lt;ten-may-chu&gt;.local:7070/manifest.json<button class="copybtn" data-copy="http://<ten-may-chu>.local:7070/manifest.json">Sao chép</button></div>
-    </div>
-    <div class="panel rv" id="cpanel-stremio" hidden>
-      <ol class="steps">
-        <li><div><strong>Bật server phụ trợ</strong> (Cách B) chạy ở cổng :7070.</div></li>
-        <li><div><strong>Dán thẳng link manifest vào ô tìm kiếm của Stremio</strong>, hoặc mở bằng đường dẫn <span class="mono">stremio://</span>.</div></li>
-        <li><div><strong>Kiểm tra lại:</strong> tiện ích sẽ xuất hiện trong mục Add-ons đã cài, và khi bấm vào bất kỳ bộ phim nào bạn sẽ thấy thêm các dòng nguồn phát mới.</div></li>
-      </ol>
-      <p style="color:var(--muted)">Ưu tiên dùng tên miền <span class="mono">.local</span> để Stremio luôn kết nối ổn định kể cả khi modem Wi-Fi khởi động lại và đổi IP.</p>
-      <div class="codebox">http://&lt;ten-may-chu&gt;.local:7070/manifest.json<br>stremio://&lt;ten-may-chu&gt;.local:7070/manifest.json<button class="copybtn" data-copy="http://<ten-may-chu>.local:7070/manifest.json">Sao chép</button></div>
-    </div>
-  </section>
+      <div class="devgrid rv" role="group" aria-label="Chọn thiết bị sử dụng">
+        <button class="dev" aria-pressed="true" data-dev="tv"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-tv" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M16 3l-4 4l-4 -4" /></svg></span><b>TV — rạp phim tại
+            gia</b><small>Trải nghiệm chính. Màn hình lớn, giải mã phần cứng, chuẩn 4K.</small></button>
+        <button class="dev" aria-pressed="false" data-dev="phone"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-mobile" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 3m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" /><path d="M11 4h2" /><path d="M12 17l.01 0" /></svg></span><b>Điện thoại — trung tâm
+            điều khiển</b><small>Lướt tìm phim, quản lý nguồn, xử lý nhanh từ xa.</small></button>
+        <button class="dev" aria-pressed="false" data-dev="tablet"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-tablet" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 4m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" /><path d="M12 17l.01 0" /></svg></span><b>Máy tính bảng — giải trí
+            cơ động</b><small>Xem trên giường, phòng bếp hoặc mang theo khi đi chơi.</small></button>
+        <button class="dev" aria-pressed="false" data-dev="desk"><span class="ic"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-device-laptop" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 19l18 0" /><path d="M5 6m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" /></svg></span><b>Laptop — trạm vận
+            hành</b><small>Chạy server phụ trợ, cập nhật mã nguồn, xem qua Stremio.</small></button>
+      </div>
+      <div class="panel rv" id="devPanel" style="margin-top:12px"></div>
 
-  <!-- DAILY USE -->
-  <section id="daily">
-    <div class="sec-head rv"><div><div class="num">05 — SỬ DỤNG HÀNG NGÀY</div><h2>Thoải mái xem phim,<br><em>trên mọi màn hình.</em></h2></div><p>Cài đặt chỉ tốn vài phút ban đầu, còn đây là trải nghiệm dùng hàng ngày. Chạm vào từng thiết bị để xem cách tận dụng hiệu quả nhất.</p></div>
+      <h3 class="rv" style="font-size:22px;letter-spacing:-.02em;margin:28px 0 4px">Nhịp sử dụng quen thuộc mỗi ngày
+      </h3>
+      <div class="timeline rv">
+        <article class="tl">
+          <div class="t">BAN NGÀY — TRÊN ĐIỆN THOẠI</div>
+          <h4>Lướt tìm phim lúc rảnh</h4>
+          <p>Tranh thủ giờ nghỉ lướt xem phim hay, kiểm tra trước xem nguồn nào đã có bản đẹp hay 4K. Không cần tải
+            trước gì cả, chỉ cần lưu lại tên phim.</p>
+        </article>
+        <article class="tl">
+          <div class="t">BUỔI TỐI — TRÊN MÀN HÌNH TV</div>
+          <h4>Lên đèn và thưởng thức</h4>
+          <p>Mở phim trong Nuvio trên TV. Chọn <strong>Movy 2160p</strong> cho phim điện ảnh mãn nhãn, hoặc
+            <strong>7Movies 1080p</strong> nếu mạng buổi tối hơi chập chờn. Phụ đề đã có sẵn trong trình phát.
+          </p>
+        </article>
+        <article class="tl">
+          <div class="t">TRONG LÚC XEM — MỌI MÀN HÌNH</div>
+          <h4>Mẹo chọn chất lượng chuẩn</h4>
+          <p>Không phải lúc nào 4K cũng tối ưu nhất: bản 1080p MP4 vào phim gần như tức thì và tua rất mượt; bản 4K HLS
+            phát huy tối đa trên TV cắm dây LAN hoặc Wi-Fi 5GHz mạnh. Nếu một nguồn bị đứng hình, cứ thoát ra chọn nguồn
+            khác.</p>
+        </article>
+        <article class="tl">
+          <div class="t">ĐI DU LỊCH — TABLET / LAPTOP</div>
+          <h4>Mang rạp phim theo bên mình</h4>
+          <p>Cách A hoạt động ở bất cứ đâu có internet — đi công tác hay du lịch đều dùng bình thường. Riêng link LAN
+            của Cách B chỉ dùng trong mạng nội bộ ở nhà; khi ra ngoài hãy chuyển sang Cách A hoặc bản deploy trên cloud.
+          </p>
+        </article>
+      </div>
 
-    <div class="devgrid rv" role="group" aria-label="Chọn thiết bị sử dụng">
-      <button class="dev" aria-pressed="true" data-dev="tv"><span class="ic">📺</span><b>TV — rạp phim tại gia</b><small>Trải nghiệm chính. Màn hình lớn, giải mã phần cứng, chuẩn 4K.</small></button>
-      <button class="dev" aria-pressed="false" data-dev="phone"><span class="ic">📱</span><b>Điện thoại — trung tâm điều khiển</b><small>Lướt tìm phim, quản lý nguồn, xử lý nhanh từ xa.</small></button>
-      <button class="dev" aria-pressed="false" data-dev="tablet"><span class="ic">▦</span><b>Máy tính bảng — giải trí cơ động</b><small>Xem trên giường, phòng bếp hoặc mang theo khi đi chơi.</small></button>
-      <button class="dev" aria-pressed="false" data-dev="desk"><span class="ic">💻</span><b>Laptop — trạm vận hành</b><small>Chạy server phụ trợ, cập nhật mã nguồn, xem qua Stremio.</small></button>
-    </div>
-    <div class="panel rv" id="devPanel" style="margin-top:12px"></div>
+      <div class="paths rv" style="margin-top:14px">
+        <article class="pathcard">
+          <h3 style="margin-top:0">Xử lý nhanh khi phim không chạy</h3>
+          <ol class="steps">
+            <li>
+              <div><strong>Báo lỗi 428 / bị chặn?</strong> Do bạn đang dùng bản cũ chưa có header okhttp — hãy cập nhật
+                lại link manifest mới nhất.</div>
+            </li>
+            <li>
+              <div><strong>Lỗi 429 / không hiện danh sách nguồn?</strong> Hãy kiên nhẫn đợi khoảng 1 phút. Hệ thống tự
+                động giãn nhịp khi máy chủ gốc quá tải — bấm thử lại liên tục càng dễ bị chặn lâu hơn.</div>
+            </li>
+            <li>
+              <div><strong>FlyStream không ra kết quả?</strong> Kiểm tra xem server phụ trợ đã bật chưa, hoặc địa chỉ IP
+                có bị đổi không. Khởi động lại <span class="mono">server.js</span> và ưu tiên dùng tên miền <span
+                  class="mono">.local</span>.</div>
+            </li>
+            <li>
+              <div><strong>Trống trơn không thấy nguồn nào?</strong> Vào cài đặt Nuvio kiểm tra mục “Enable plugin
+                providers globally” đã bật chưa và đảm bảo bạn đang dùng bản APK cài ngoài.</div>
+            </li>
+          </ol>
+        </article>
+        <article class="pathcard">
+          <h3 style="margin-top:0">Bí quyết giúp chạy mượt trên máy yếu</h3>
+          <p style="color:var(--muted)">Hệ thống được tinh chỉnh kỹ cho các đầu TV Box RAM 1.5–2 GB: đặt <strong>giới
+              hạn thời gian tối đa 9 giây</strong> cho mỗi nguồn để không treo app, bộ nhớ đệm LRU/FIFO siêu nhẹ, gộp
+            các yêu cầu trùng lặp và đọc luồng HLS một lượt duy nhất. 7Movies tự động thử lại thông minh theo <span
+              class="mono">Retry-After</span>; còn Movy dò cuốn chiếu 3 server cùng lúc (ưu tiên Miami và Boise) và tạm
+            nghỉ 30 giây nếu gặp giới hạn 429.</p>
+          <p style="color:var(--muted)">Thói quen bảo trì mỗi tuần: chạy <span class="mono">git pull</span>, gõ <span
+              class="mono">npm run build</span> rồi khởi động lại server — chỉ mất chưa đầy 2 phút để toàn bộ thiết bị
+            trong nhà luôn có nguồn phim mới nhất.</p>
+        </article>
+      </div>
+    </section>
 
-    <h3 class="rv" style="font-size:22px;letter-spacing:-.02em;margin:28px 0 4px">Nhịp sử dụng quen thuộc mỗi ngày</h3>
-    <div class="timeline rv">
-      <article class="tl"><div class="t">BAN NGÀY — TRÊN ĐIỆN THOẠI</div><h4>Lướt tìm phim lúc rảnh</h4><p>Tranh thủ giờ nghỉ lướt xem phim hay, kiểm tra trước xem nguồn nào đã có bản đẹp hay 4K. Không cần tải trước gì cả, chỉ cần lưu lại tên phim.</p></article>
-      <article class="tl"><div class="t">BUỔI TỐI — TRÊN MÀN HÌNH TV</div><h4>Lên đèn và thưởng thức</h4><p>Mở phim trong Nuvio trên TV. Chọn <strong>Movy 2160p</strong> cho phim điện ảnh mãn nhãn, hoặc <strong>7Movies 1080p</strong> nếu mạng buổi tối hơi chập chờn. Phụ đề đã có sẵn trong trình phát.</p></article>
-      <article class="tl"><div class="t">TRONG LÚC XEM — MỌI MÀN HÌNH</div><h4>Mẹo chọn chất lượng chuẩn</h4><p>Không phải lúc nào 4K cũng tối ưu nhất: bản 1080p MP4 vào phim gần như tức thì và tua rất mượt; bản 4K HLS phát huy tối đa trên TV cắm dây LAN hoặc Wi-Fi 5GHz mạnh. Nếu một nguồn bị đứng hình, cứ thoát ra chọn nguồn khác.</p></article>
-      <article class="tl"><div class="t">ĐI DU LỊCH — TABLET / LAPTOP</div><h4>Mang rạp phim theo bên mình</h4><p>Cách A hoạt động ở bất cứ đâu có internet — đi công tác hay du lịch đều dùng bình thường. Riêng link LAN của Cách B chỉ dùng trong mạng nội bộ ở nhà; khi ra ngoài hãy chuyển sang Cách A hoặc bản deploy trên cloud.</p></article>
-    </div>
+    <!-- FAQ -->
+    <section>
+      <div class="sec-head rv">
+        <div>
+          <div class="num">06 — HỎI ĐÁP NHANH</div>
+          <h2>Giải đáp<br><em>thắc mắc thường gặp.</em></h2>
+        </div>
+        <p></p>
+      </div>
+      <details class="rv">
+        <summary>Tôi có phải đăng ký tài khoản hay mua API key không?</summary>
+        <p>Hoàn toàn không cần tài khoản hay API key cho các nguồn phim — chỉ cần dán link manifest là dùng được 7Movies
+          và Movy. Riêng với Nuvio, bạn chỉ dùng tài khoản Nuvio cá nhân tại nuvioapp.space để đồng bộ cài đặt lên TV
+          cho tiện (hoặc nhập thẳng trên TV cũng được). Chỉ khi dùng thêm FlyStream mới cần bật server phụ trợ.</p>
+      </details>
+      <details class="rv">
+        <summary>Tôi có bắt buộc phải tự chạy server không?</summary>
+        <p>Không bắt buộc. Bạn chỉ cần server nếu muốn dùng FlyStream, WuPlay hoặc chế độ add-on trên Stremio. Nếu chỉ
+          xem qua Nuvio với hai nguồn chủ lực là 7Movies và Movy, hãy chọn Cách A (dùng link GitHub) — mọi thứ chạy trực
+          tiếp ngay trên TV của bạn.</p>
+      </details>
+      <details class="rv">
+        <summary>Giao diện hướng dẫn này có gì đặc biệt?</summary>
+        <p>Trang hướng dẫn được thiết kế theo triết lý <a href="https://github.com/leonxlnx/taste-skill" target="_blank"
+            rel="noopener">Taste Skill</a> kết hợp phong cách biên tập hiện đại: mỗi màn hình truyền tải trọn vẹn một ý
+          chính, sử dụng trình mô phỏng tương tác trực tiếp thay cho hình minh họa tĩnh, giúp bạn nắm bắt luồng hoạt
+          động từ gốc tới ngọn chỉ trong vài phút đọc lướt.</p>
+      </details>
+      <details class="rv">
+        <summary>Tôi có thể xem mã nguồn dự án ở đâu?</summary>
+        <p>Toàn bộ mã nguồn mở theo giấy phép MIT được lưu tại <a
+            href="https://github.com/phuanh004/direct-streams-providers" target="_blank"
+            rel="noopener">github.com/phuanh004/direct-streams-providers</a> — các bộ scraper nằm trong thư mục <span
+            class="mono">providers/</span>, mã server nằm ở <span class="mono">server.js</span> / <span
+            class="mono">worker.js</span> và đóng gói bằng <span class="mono">build.js</span>.</p>
+      </details>
+    </section>
 
-    <div class="paths rv" style="margin-top:14px">
-      <article class="pathcard"><h3 style="margin-top:0">Xử lý nhanh khi phim không chạy</h3><ol class="steps"><li><div><strong>Báo lỗi 428 / bị chặn?</strong> Do bạn đang dùng bản cũ chưa có header okhttp — hãy cập nhật lại link manifest mới nhất.</div></li><li><div><strong>Lỗi 429 / không hiện danh sách nguồn?</strong> Hãy kiên nhẫn đợi khoảng 1 phút. Hệ thống tự động giãn nhịp khi máy chủ gốc quá tải — bấm thử lại liên tục càng dễ bị chặn lâu hơn.</div></li><li><div><strong>FlyStream không ra kết quả?</strong> Kiểm tra xem server phụ trợ đã bật chưa, hoặc địa chỉ IP có bị đổi không. Khởi động lại <span class="mono">server.js</span> và ưu tiên dùng tên miền <span class="mono">.local</span>.</div></li><li><div><strong>Trống trơn không thấy nguồn nào?</strong> Vào cài đặt Nuvio kiểm tra mục “Enable plugin providers globally” đã bật chưa và đảm bảo bạn đang dùng bản APK cài ngoài.</div></li></ol></article>
-      <article class="pathcard"><h3 style="margin-top:0">Bí quyết giúp chạy mượt trên máy yếu</h3><p style="color:var(--muted)">Hệ thống được tinh chỉnh kỹ cho các đầu TV Box RAM 1.5–2 GB: đặt <strong>giới hạn thời gian tối đa 9 giây</strong> cho mỗi nguồn để không treo app, bộ nhớ đệm LRU/FIFO siêu nhẹ, gộp các yêu cầu trùng lặp và đọc luồng HLS một lượt duy nhất. 7Movies tự động thử lại thông minh theo <span class="mono">Retry-After</span>; còn Movy dò cuốn chiếu 3 server cùng lúc (ưu tiên Miami và Boise) và tạm nghỉ 30 giây nếu gặp giới hạn 429.</p><p style="color:var(--muted)">Thói quen bảo trì mỗi tuần: chạy <span class="mono">git pull</span>, gõ <span class="mono">npm run build</span> rồi khởi động lại server — chỉ mất chưa đầy 2 phút để toàn bộ thiết bị trong nhà luôn có nguồn phim mới nhất.</p></article>
-    </div>
-  </section>
+    <footer class="rv">
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;opacity:.7">THIẾT LẬP MỘT LẦN —</div>
+      <h2>Lên phim tối nay,<br>mượt trên mọi màn hình.</h2>
+      <p style="max-width:560px;opacity:.85">Direct Streams Providers v1.0.14 · Giấy phép MIT · Đã kiểm chứng chạy mượt
+        trên onn. 4K Plus / Android TV — giải mã phần cứng Amlogic, không giật đứng hình.</p>
+      <p><a href="https://github.com/phuanh004/direct-streams-providers" target="_blank" rel="noopener">Mã nguồn GitHub
+          ↗</a> &nbsp;·&nbsp; <a href="#server">Cài đặt server</a> &nbsp;·&nbsp; <a href="#daily">Cách dùng hàng
+          ngày</a> &nbsp;·&nbsp; <a href="https://github.com/leonxlnx/taste-skill" target="_blank" rel="noopener">Taste
+          Skill ↗</a></p>
+    </footer>
+  </div>
 
-  <!-- FAQ -->
-  <section>
-    <div class="sec-head rv"><div><div class="num">06 — HỎI ĐÁP NHANH</div><h2>Giải đáp<br><em>thắc mắc thường gặp.</em></h2></div><p></p></div>
-    <details class="rv"><summary>Tôi có phải đăng ký tài khoản hay mua API key không?</summary><p>Hoàn toàn không cần tài khoản hay API key cho các nguồn phim — chỉ cần dán link manifest là dùng được 7Movies và Movy. Riêng với Nuvio, bạn chỉ dùng tài khoản Nuvio cá nhân tại nuvioapp.space để đồng bộ cài đặt lên TV cho tiện (hoặc nhập thẳng trên TV cũng được). Chỉ khi dùng thêm FlyStream mới cần bật server phụ trợ.</p></details>
-    <details class="rv"><summary>Tôi có bắt buộc phải tự chạy server không?</summary><p>Không bắt buộc. Bạn chỉ cần server nếu muốn dùng FlyStream, WuPlay hoặc chế độ add-on trên Stremio. Nếu chỉ xem qua Nuvio với hai nguồn chủ lực là 7Movies và Movy, hãy chọn Cách A (dùng link GitHub) — mọi thứ chạy trực tiếp ngay trên TV của bạn.</p></details>
-    <details class="rv"><summary>Giao diện hướng dẫn này có gì đặc biệt?</summary><p>Trang hướng dẫn được thiết kế theo triết lý <a href="https://github.com/leonxlnx/taste-skill" target="_blank" rel="noopener">Taste Skill</a> kết hợp phong cách biên tập hiện đại: mỗi màn hình truyền tải trọn vẹn một ý chính, sử dụng trình mô phỏng tương tác trực tiếp thay cho hình minh họa tĩnh, giúp bạn nắm bắt luồng hoạt động từ gốc tới ngọn chỉ trong vài phút đọc lướt.</p></details>
-    <details class="rv"><summary>Tôi có thể xem mã nguồn dự án ở đâu?</summary><p>Toàn bộ mã nguồn mở theo giấy phép MIT được lưu tại <a href="https://github.com/phuanh004/direct-streams-providers" target="_blank" rel="noopener">github.com/phuanh004/direct-streams-providers</a> — các bộ scraper nằm trong thư mục <span class="mono">providers/</span>, mã server nằm ở <span class="mono">server.js</span> / <span class="mono">worker.js</span> và đóng gói bằng <span class="mono">build.js</span>.</p></details>
-  </section>
-
-  <footer class="rv">
-    <div class="mono" style="font-size:11px;letter-spacing:.1em;opacity:.7">THIẾT LẬP MỘT LẦN —</div>
-    <h2>Lên phim tối nay,<br>mượt trên mọi màn hình.</h2>
-    <p style="max-width:560px;opacity:.85">Direct Streams Providers v1.0.14 · Giấy phép MIT · Đã kiểm chứng chạy mượt trên onn. 4K Plus / Android TV — giải mã phần cứng Amlogic, không giật đứng hình.</p>
-    <p><a href="https://github.com/phuanh004/direct-streams-providers" target="_blank" rel="noopener">Mã nguồn GitHub ↗</a> &nbsp;·&nbsp; <a href="#server">Cài đặt server</a> &nbsp;·&nbsp; <a href="#daily">Cách dùng hàng ngày</a> &nbsp;·&nbsp; <a href="https://github.com/leonxlnx/taste-skill" target="_blank" rel="noopener">Taste Skill ↗</a></p>
-  </footer>
-</div>
-
-<script>
-(function(){
-  // clock + progress
-  var clock=document.getElementById('clock'), pl=document.getElementById('progressLine');
-  function tickClock(){ if(!clock) return; try{ clock.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+' · LOCAL'; }catch(e){} }
-  tickClock(); setInterval(tickClock,30000);
-  window.addEventListener('scroll',function(){ var h=document.documentElement; var p=h.scrollTop/(h.scrollHeight-h.clientHeight||1); pl.style.width=(p*100)+'%'; },{passive:true});
-  // reveal
-  var io=('IntersectionObserver' in window)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.12}):null;
-  document.querySelectorAll('.rv').forEach(function(el){ if(io) io.observe(el); else el.classList.add('in'); });
-  // copy
-  document.querySelectorAll('[data-copy]').forEach(function(b){ b.addEventListener('click',function(){ var t=b.getAttribute('data-copy'); if(navigator.clipboard) navigator.clipboard.writeText(t); var o=b.textContent; b.textContent='Đã chép ✓'; setTimeout(function(){b.textContent=o;},1500); }); });
-  // generic tabs
-  function wireTabs(attr,prefix,ids){ var tabs=document.querySelectorAll('['+attr+']'); tabs.forEach(function(t){ t.addEventListener('click',function(){ tabs.forEach(function(x){x.setAttribute('aria-selected','false')}); t.setAttribute('aria-selected','true'); ids.forEach(function(id){ var p=document.getElementById(prefix+id); if(p) p.hidden=(id!==t.getAttribute(attr)); }); }); }); }
-  wireTabs('data-stab','spanel-',['lan','cf','vercel','test']);
-  wireTabs('data-ctab','cpanel-',['nuvio','wuplay','stremio']);
-  // simulator
-  var pipeSteps=document.querySelectorAll('#pipe .pstep');
-  var simOut=document.getElementById('simOut'), running=false;
-  function pickGroup(id){ var sel={title:'Oppenheimer',id:'872585',type:'movie',prov:'Movy'}; document.querySelectorAll('#titleChips .chipbtn').forEach(function(b){ if(b.getAttribute('aria-pressed')==='true'){ sel.title=b.dataset.title; sel.id=b.dataset.id; sel.type=b.dataset.type; } }); document.querySelectorAll('#provChips .chipbtn').forEach(function(b){ if(b.getAttribute('aria-pressed')==='true') sel.prov=b.dataset.prov; }); return sel; }
-  function chipWire(id){ document.querySelectorAll('#'+id+' .chipbtn').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('#'+id+' .chipbtn').forEach(function(x){x.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); }); }); }
-  chipWire('titleChips'); chipWire('provChips');
-  document.getElementById('runSim').addEventListener('click',function(){
-    if(running) return; running=true; var s=pickGroup();
-    var isBB=s.id==='1396', isMovy=s.prov==='Movy';
-    var lines=[
-      '→ TMDB '+s.id+' · '+s.type+' · "'+s.title+'"',
-      isMovy?'→ Movy: xác thực seed mvm1 … <span class="ok">thành công</span>':'→ 7Movies: lấy mã hash enc-dec.app … <span class="ok">đã lưu cache</span>',
-      isMovy?'→ Dò server theo thứ tự — Miami, Boise … <span class="ok">khớp nguồn</span>':'→ VidLink /api/b/'+s.type+'/{hash} … <span class="ok">200 OK</span>',
-      '→ behaviorHints.proxyHeaders → UA okhttp/4.12.0 <span class="ok">đã đính kèm</span>',
-      isBB?'<span class="ok">✓ 4 luồng phát</span> · 1080p–360p · 8 bản phụ đề · CDN 206':'<span class="ok">✓ '+(isMovy?'2160p 4K HLS':'1080p MP4')+'</span> · '+(isMovy?'11':'8')+' bản phụ đề · CDN 206 · giải mã phần cứng',
-      '<span class="warn">Tổng thời gian xử lý: '+(isMovy?'3.1s':'1.8s')+' / 9s</span> — sẵn sàng chiếu trên TV.'
-    ];
-    simOut.innerHTML=''; pipeSteps.forEach(function(p){p.classList.remove('lit')});
-    lines.forEach(function(l,i){ setTimeout(function(){ simOut.innerHTML+=l+'<br>'; if(pipeSteps[Math.min(i,3)]) pipeSteps[Math.min(i,3)].classList.add('lit'); if(i===lines.length-1) running=false; }, 420*(i+1)); });
-  });
-  // devices
-  var devData={
-    tv:{h:'TV — rạp chiếu phim tại gia',b:'<ol class="steps"><li><div><strong>Mở Nuvio / WuPlay</strong> và chọn phim yêu thích. Các nguồn bạn cài một lần sẽ hiện đầy đủ dưới dạng danh sách chất lượng.</div></li><li><div><strong>Chọn độ phân giải vừa tầm mạng:</strong> ưu tiên Movy 2160p cho TV phòng khách có Wi-Fi mạnh; chọn 7Movies 1080p cho TV stick hoặc khi mạng đông người dùng.</div></li><li><div><strong>Bật phụ đề một lần cho mỗi phim</strong> — các bản phụ đề đã được nhúng sẵn theo luồng (thường có 8–11 ngôn ngữ).</div></li><li><div><strong>Nếu thấy xoay vòng (buffer):</strong> hãy hạ xuống một nấc chất lượng trước khi đổi nguồn — HLS tự điều chỉnh theo mạng, còn MP4 vào phim nhanh nhất.</div></li></ol>'},
-    phone:{h:'Điện thoại — trung tâm điều khiển từ xa',b:'<ol class="steps"><li><div><strong>Quản lý nguồn cực nhàn:</strong> thêm hoặc gỡ plugin tại <span class="mono">nuvioapp.space/account</span> — thay đổi tự đồng bộ lên TV ngay lập tức, không phải dùng remote gõ từng ký tự.</div></li><li><div><strong>Săn phim trước giờ chiếu:</strong> tranh thủ giờ nghỉ kiểm tra xem phim mới đã có bản đẹp 4K chưa để tối về mở xem luôn.</div></li><li><div><strong>Chỉnh add-on WuPlay cũng ngay trên tay</strong> — chỉ cần quét mã QR trên TV để mở config.wuplay.app và thao tác ngay trên ghế sofa.</div></li></ol>'},
-    tablet:{h:'Máy tính bảng — màn hình phụ cơ động',b:'<ol class="steps"><li><div><strong>Đồng bộ trải nghiệm như TV:</strong> cài Nuvio hoặc Stremio, dán link manifest Cách A là có ngay toàn bộ nguồn phim quen thuộc.</div></li><li><div><strong>Người bạn đồng hành khi đi xa</strong> — Cách A dùng được ở mọi nơi có internet; còn link LAN tại nhà chỉ hoạt động trong mạng Wi-Fi gia đình.</div></li><li><div><strong>Phát trực tiếp không tốn bộ nhớ</strong> — hệ thống stream thẳng từ mạng chứ không tải file về máy, nên chỉ cần đảm bảo kết nối Wi-Fi ổn định.</div></li></ol>'},
-    desk:{h:'Laptop — máy chủ & trạm kỹ thuật',b:'<ol class="steps"><li><div><strong>Dùng làm server phụ trợ tại nhà:</strong> nếu không có Raspberry Pi, bạn chỉ cần mở <span class="mono">npm run serve</span> ở cổng :7070 trên laptop mỗi khi xem nguồn FlyStream / Stremio.</div></li><li><div><strong>Cập nhật định kỳ:</strong> gõ <span class="mono">git pull → npm run build → khởi động lại server</span>. Nên chạy <span class="mono">npm run test:offline</span> kiểm tra trước buổi tối để yên tâm thưởng thức.</div></li><li><div><strong>Xem phim trực tiếp trên máy tính</strong> qua Stremio bằng đường dẫn <span class="mono">stremio://</span> — đầy đủ chất lượng 4K và phụ đề y hệt trên TV.</div></li></ol>'}
-  };
-  var devPanel=document.getElementById('devPanel');
-  function showDev(k){ var d=devData[k]; devPanel.innerHTML='<h3 style="margin:0 0 6px;font-size:22px;letter-spacing:-.02em">'+d.h+'</h3>'+d.b; }
-  document.querySelectorAll('.dev').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('.dev').forEach(function(x){x.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); showDev(b.dataset.dev); }); });
-  showDev('tv');
-})();
-</script>
+  <script>
+    (function () {
+      // clock + progress
+      var clock = document.getElementById('clock'), pl = document.getElementById('progressLine');
+      function tickClock() { if (!clock) return; try { clock.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · LOCAL'; } catch (e) { } }
+      tickClock(); setInterval(tickClock, 30000);
+      window.addEventListener('scroll', function () { var h = document.documentElement; var p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1); pl.style.width = (p * 100) + '%'; }, { passive: true });
+      // reveal
+      var io = ('IntersectionObserver' in window) ? new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }) }, { threshold: .12 }) : null;
+      document.querySelectorAll('.rv').forEach(function (el) { if (io) io.observe(el); else el.classList.add('in'); });
+      // copy
+      document.querySelectorAll('[data-copy]').forEach(function (b) { b.addEventListener('click', function () { var t = b.getAttribute('data-copy'); if (navigator.clipboard) navigator.clipboard.writeText(t); var o = b.textContent; b.textContent = 'Đã chép ✓'; setTimeout(function () { b.textContent = o; }, 1500); }); });
+      // generic tabs
+      function wireTabs(attr, prefix, ids) { var tabs = document.querySelectorAll('[' + attr + ']'); tabs.forEach(function (t) { t.addEventListener('click', function () { tabs.forEach(function (x) { x.setAttribute('aria-selected', 'false') }); t.setAttribute('aria-selected', 'true'); ids.forEach(function (id) { var p = document.getElementById(prefix + id); if (p) p.hidden = (id !== t.getAttribute(attr)); }); }); }); }
+      wireTabs('data-stab', 'spanel-', ['lan', 'cf', 'vercel', 'test']);
+      wireTabs('data-ctab', 'cpanel-', ['nuvio', 'wuplay', 'stremio']);
+      // simulator
+      var pipeSteps = document.querySelectorAll('#pipe .pstep');
+      var simOut = document.getElementById('simOut'), running = false;
+      function pickGroup(id) { var sel = { title: 'Oppenheimer', id: '872585', type: 'movie', prov: 'Movy' }; document.querySelectorAll('#titleChips .chipbtn').forEach(function (b) { if (b.getAttribute('aria-pressed') === 'true') { sel.title = b.dataset.title; sel.id = b.dataset.id; sel.type = b.dataset.type; } }); document.querySelectorAll('#provChips .chipbtn').forEach(function (b) { if (b.getAttribute('aria-pressed') === 'true') sel.prov = b.dataset.prov; }); return sel; }
+      function chipWire(id) { document.querySelectorAll('#' + id + ' .chipbtn').forEach(function (b) { b.addEventListener('click', function () { document.querySelectorAll('#' + id + ' .chipbtn').forEach(function (x) { x.setAttribute('aria-pressed', 'false') }); b.setAttribute('aria-pressed', 'true'); }); }); }
+      chipWire('titleChips'); chipWire('provChips');
+      document.getElementById('runSim').addEventListener('click', function () {
+        if (running) return; running = true; var s = pickGroup();
+        var isBB = s.id === '1396', isMovy = s.prov === 'Movy';
+        var lines = [
+          '→ TMDB ' + s.id + ' · ' + s.type + ' · "' + s.title + '"',
+          isMovy ? '→ Movy: xác thực seed mvm1 … <span class="ok">thành công</span>' : '→ 7Movies: lấy mã hash enc-dec.app … <span class="ok">đã lưu cache</span>',
+          isMovy ? '→ Dò server theo thứ tự — Miami, Boise … <span class="ok">khớp nguồn</span>' : '→ VidLink /api/b/' + s.type + '/{hash} … <span class="ok">200 OK</span>',
+          '→ behaviorHints.proxyHeaders → UA okhttp/4.12.0 <span class="ok">đã đính kèm</span>',
+          isBB ? '<span class="ok">✓ 4 luồng phát</span> · 1080p–360p · 8 bản phụ đề · CDN 206' : '<span class="ok">✓ ' + (isMovy ? '2160p 4K HLS' : '1080p MP4') + '</span> · ' + (isMovy ? '11' : '8') + ' bản phụ đề · CDN 206 · giải mã phần cứng',
+          '<span class="warn">Tổng thời gian xử lý: ' + (isMovy ? '3.1s' : '1.8s') + ' / 9s</span> — sẵn sàng chiếu trên TV.'
+        ];
+        simOut.innerHTML = ''; pipeSteps.forEach(function (p) { p.classList.remove('lit') });
+        lines.forEach(function (l, i) { setTimeout(function () { simOut.innerHTML += l + '<br>'; if (pipeSteps[Math.min(i, 3)]) pipeSteps[Math.min(i, 3)].classList.add('lit'); if (i === lines.length - 1) running = false; }, 420 * (i + 1)); });
+      });
+      // devices
+      var devData = {
+        tv: { h: 'TV — rạp chiếu phim tại gia', b: '<ol class="steps"><li><div><strong>Mở Nuvio / WuPlay</strong> và chọn phim yêu thích. Các nguồn bạn cài một lần sẽ hiện đầy đủ dưới dạng danh sách chất lượng.</div></li><li><div><strong>Chọn độ phân giải vừa tầm mạng:</strong> ưu tiên Movy 2160p cho TV phòng khách có Wi-Fi mạnh; chọn 7Movies 1080p cho TV stick hoặc khi mạng đông người dùng.</div></li><li><div><strong>Bật phụ đề một lần cho mỗi phim</strong> — các bản phụ đề đã được nhúng sẵn theo luồng (thường có 8–11 ngôn ngữ).</div></li><li><div><strong>Nếu thấy xoay vòng (buffer):</strong> hãy hạ xuống một nấc chất lượng trước khi đổi nguồn — HLS tự điều chỉnh theo mạng, còn MP4 vào phim nhanh nhất.</div></li></ol>' },
+        phone: { h: 'Điện thoại — trung tâm điều khiển từ xa', b: '<ol class="steps"><li><div><strong>Quản lý nguồn cực nhàn:</strong> thêm hoặc gỡ plugin tại <span class="mono">nuvioapp.space/account</span> — thay đổi tự đồng bộ lên TV ngay lập tức, không phải dùng remote gõ từng ký tự.</div></li><li><div><strong>Săn phim trước giờ chiếu:</strong> tranh thủ giờ nghỉ kiểm tra xem phim mới đã có bản đẹp 4K chưa để tối về mở xem luôn.</div></li><li><div><strong>Chỉnh add-on WuPlay cũng ngay trên tay</strong> — chỉ cần quét mã QR trên TV để mở config.wuplay.app và thao tác ngay trên ghế sofa.</div></li></ol>' },
+        tablet: { h: 'Máy tính bảng — màn hình phụ cơ động', b: '<ol class="steps"><li><div><strong>Đồng bộ trải nghiệm như TV:</strong> cài Nuvio hoặc Stremio, dán link manifest Cách A là có ngay toàn bộ nguồn phim quen thuộc.</div></li><li><div><strong>Người bạn đồng hành khi đi xa</strong> — Cách A dùng được ở mọi nơi có internet; còn link LAN tại nhà chỉ hoạt động trong mạng Wi-Fi gia đình.</div></li><li><div><strong>Phát trực tiếp không tốn bộ nhớ</strong> — hệ thống stream thẳng từ mạng chứ không tải file về máy, nên chỉ cần đảm bảo kết nối Wi-Fi ổn định.</div></li></ol>' },
+        desk: { h: 'Laptop — máy chủ & trạm kỹ thuật', b: '<ol class="steps"><li><div><strong>Dùng làm server phụ trợ tại nhà:</strong> nếu không có Raspberry Pi, bạn chỉ cần mở <span class="mono">npm run serve</span> ở cổng :7070 trên laptop mỗi khi xem nguồn FlyStream / Stremio.</div></li><li><div><strong>Cập nhật định kỳ:</strong> gõ <span class="mono">git pull → npm run build → khởi động lại server</span>. Nên chạy <span class="mono">npm run test:offline</span> kiểm tra trước buổi tối để yên tâm thưởng thức.</div></li><li><div><strong>Xem phim trực tiếp trên máy tính</strong> qua Stremio bằng đường dẫn <span class="mono">stremio://</span> — đầy đủ chất lượng 4K và phụ đề y hệt trên TV.</div></li></ol>' }
+      };
+      var devPanel = document.getElementById('devPanel');
+      function showDev(k) { var d = devData[k]; devPanel.innerHTML = '<h3 style="margin:0 0 6px;font-size:22px;letter-spacing:-.02em">' + d.h + '</h3>' + d.b; }
+      document.querySelectorAll('.dev').forEach(function (b) { b.addEventListener('click', function () { document.querySelectorAll('.dev').forEach(function (x) { x.setAttribute('aria-pressed', 'false') }); b.setAttribute('aria-pressed', 'true'); showDev(b.dataset.dev); }); });
+      showDev('tv');
+    })();
+  </script>
 </body>
+
 </html>
