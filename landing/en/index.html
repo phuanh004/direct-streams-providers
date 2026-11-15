@@ -33,7 +33,8 @@ button{font:inherit;min-height:44px;min-width:44px;cursor:pointer}
 .brand:hover{border-color:var(--accent)}
 .brand span{color:var(--accent)}
 .fnav{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.fnav a{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;border:1px solid var(--line);background:color-mix(in srgb, var(--bg) 82%, transparent);backdrop-filter:blur(8px);padding:8px 11px;border-radius:999px}
+.fnav a{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;border:1px solid var(--line);background:color-mix(in srgb, var(--bg) 82%, transparent);backdrop-filter:blur(8px);padding:8px 11px;border-radius:999px;display:inline-flex;align-items:center;gap:6px}
+.fnav a svg{display:block}
 .fnav a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .fmeta{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 .fmeta b{color:var(--ink)}
@@ -169,7 +170,7 @@ footer a{color:inherit}
   <div class="frame-row">
     <a class="brand" href="#top">DIRECT—STREAMS<span>.</span></a>
     <nav class="fnav">
-      <a href="#system">System</a><a href="#server">Server setup</a><a href="#clients">Clients</a><a href="#daily">Daily use</a><a href="https://github.com/phuanh004/direct-streams-providers" target="_blank" rel="noopener">GitHub ↗</a><a href="/vi" style="font-weight:700">🇻🇳 Tiếng Việt</a>
+      <a href="#system">System</a><a href="#server">Server setup</a><a href="#clients">Clients</a><a href="#daily">Daily use</a><a href="https://github.com/phuanh004/direct-streams-providers" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" /></svg>GitHub ↗</a><a href="/vi" style="font-weight:700">🇻🇳 Tiếng Việt</a>
     </nav>
   </div>
 </div>
