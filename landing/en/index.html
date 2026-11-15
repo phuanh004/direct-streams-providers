@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="color-scheme" content="light dark"/>
+<link rel="icon" href="data:,"/>
+<title>Direct Streams Providers — Setup & Daily Use Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,500;0,600;0,800;0,900;1,600&family=Newsreader:ital,opsz,wght@1,6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a09; --bg2:#121110; --surface:#171614; --ink:#f2efe9; --muted:#9c968a; --line:#2a2824;
+  --accent:#ff3b00; --accent2:#ffb800; --teal:#2dd4bf; --card:#141311;
+  --code:#000; --code-ink:#ffb800;
+}
+@media (prefers-color-scheme: light){
+  :root{ --bg:#f4f2ec; --bg2:#ece9e0; --surface:#fff; --ink:#11100e; --muted:#6d675c; --line:#ddd8cb; --card:#fff; --code:#11100e; }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Archivo",system-ui,sans-serif;line-height:1.55;overflow-x:hidden}
+a{color:inherit}
+button{font:inherit;min-height:44px;min-width:44px;cursor:pointer}
+.mono{font-family:"IBM Plex Mono",monospace}
+.serif-i{font-family:"Newsreader",serif;font-style:italic;font-weight:500}
+/* ---------- fixed frame : four corners ---------- */
+.frame{position:fixed;inset:0;pointer-events:none;z-index:50;display:flex;flex-direction:column;justify-content:space-between;padding:14px 18px}
+.frame-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.frame a,.frame button{pointer-events:auto}
+.brand{font-weight:900;letter-spacing:-.03em;font-size:15px;text-decoration:none;line-height:1}
+.brand span{color:var(--accent)}
+.fnav{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.fnav a{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;border:1px solid var(--line);background:color-mix(in srgb, var(--bg) 82%, transparent);backdrop-filter:blur(8px);padding:8px 11px;border-radius:999px}
+.fnav a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.fmeta{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.fmeta b{color:var(--ink)}
+.progressline{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0%;z-index:60}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+/* ---------- hero ---------- */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:110px 0 0;position:relative}
+.hero-kicker{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hero-kicker b{color:var(--teal)}
+.hero h1{font-size:clamp(64px,13.5vw,168px);line-height:.84;letter-spacing:-.045em;font-weight:900;text-transform:uppercase;margin:26px 0 8px}
+.hero h1 .line{display:block;overflow:hidden}
+.hero h1 .line>span{display:block;animation:rise .9s cubic-bezier(.22,1,.36,1) both}
+.hero h1 .line:nth-child(2)>span{animation-delay:.12s}
+.hero h1 .line:nth-child(3)>span{animation-delay:.24s}
+@keyframes rise{from{transform:translateY(110%)}to{transform:translateY(0)}}
+.hero h1 em{font-family:"Newsreader",serif;font-style:italic;font-weight:500;text-transform:none;letter-spacing:-.02em;color:var(--accent)}
+.hero-sub{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:start;margin:18px 0 28px}
+@media(max-width:820px){.hero-sub{grid-template-columns:1fr}}
+.hero-sub p{font-size:clamp(17px,2.2vw,21px);line-height:1.5;margin:0;max-width:620px}
+.hero-sub p strong{background:var(--accent);color:#fff;padding:0 6px}
+.hero-cta{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;padding:14px 20px;border-radius:999px;border:1px solid var(--ink);font-size:15px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:hover{transform:translateY(-1px)}
+/* TV mock — real product UI, not a photo */
+.tv{border:1px solid var(--line);background:#000;color:#fff;border-radius:18px;overflow:hidden}
+.tv-top{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #222;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.07em;color:#9ca3af}
+.tv-top b{color:#fff}
+.tv-body{padding:18px}
+.tv-title{font-size:clamp(26px,4vw,40px);font-weight:900;line-height:.95;letter-spacing:-.03em}
+.tv-title em{font-family:"Newsreader",serif;font-style:italic;font-weight:500;color:var(--accent2)}
+.streamrow{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #262626;background:#111;padding:12px 14px;border-radius:12px;margin-top:10px;font-size:14px}
+.streamrow.hot{border-color:var(--accent);background:#1a0d08}
+.streamrow .q{font-weight:900}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.packet{height:3px;background:#222;border-radius:99px;overflow:hidden;margin-top:14px}
+.packet i{display:block;height:100%;width:38%;background:var(--accent);animation:slide 2.2s cubic-bezier(.65,0,.35,1) infinite}
+@keyframes slide{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
+/* marquee */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:12px 0;background:var(--bg2)}
+.marquee-track{display:inline-block;animation:mq 26s linear infinite;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;font-size:20px}
+.marquee-track span{color:var(--accent);padding:0 10px}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* sections — one idea per screen */
+section{padding:84px 0 10px}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;border-top:2px solid var(--ink);padding-top:16px;margin-bottom:22px;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(38px,6vw,64px);line-height:.9;letter-spacing:-.04em;font-weight:900;text-transform:uppercase;margin:0}
+.sec-head h2 em{font-family:"Newsreader",serif;font-style:italic;font-weight:500;text-transform:none;color:var(--accent)}
+.sec-head p{color:var(--muted);max-width:440px;margin:0;font-size:15px}
+.num{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);letter-spacing:.1em}
+/* reveal */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} .rv{opacity:1;transform:none} html{scroll-behavior:auto} }
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:860px){.pipe{grid-template-columns:1fr}}
+.pstep{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;position:relative}
+.pstep .n{font-size:44px;font-weight:900;letter-spacing:-.04em;color:var(--accent);line-height:1}
+.pstep h3{margin:8px 0 6px;font-size:19px}
+.pstep p{color:var(--muted);font-size:14px;margin:0}
+.pstep.lit{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+/* simulator */
+.sim{background:#000;color:#fff;border-radius:20px;padding:22px;border:1px solid var(--line)}
+.sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:860px){.sim-grid{grid-template-columns:1fr}}
+.chiprow{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+.chipbtn{background:#111;color:#d1d5db;border:1px solid #333;border-radius:999px;padding:10px 16px;font-weight:700}
+.chipbtn[aria-pressed="true"]{background:#fff;color:#000;border-color:#fff}
+.runbtn{background:var(--accent);color:#fff;border:0;border-radius:999px;padding:14px 22px;font-weight:900;width:100%}
+.sim-out{font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.9;color:#d1d5db;min-height:190px}
+.sim-out .ok{color:var(--teal)} .sim-out .warn{color:var(--accent2)}
+/* index list — providers */
+.indexlist{border-top:1px solid var(--line)}
+.irow{display:grid;grid-template-columns:64px 1fr auto;gap:16px;align-items:start;padding:22px 4px;border-bottom:1px solid var(--line)}
+@media(max-width:700px){.irow{grid-template-columns:1fr}}
+.irow .idx{font-family:"IBM Plex Mono",monospace;color:var(--muted)}
+.irow h3{font-size:clamp(28px,4vw,42px);letter-spacing:-.03em;line-height:.95;margin:0 0 8px;font-weight:900;text-transform:uppercase}
+.irow p{color:var(--muted);margin:0;max-width:560px}
+.badge{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);padding:7px 10px;border-radius:999px;white-space:nowrap}
+.badge.live{color:var(--teal);border-color:var(--teal)} .badge.needs{color:var(--accent2);border-color:var(--accent2)}
+.specs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.spec{font-family:"IBM Plex Mono",monospace;font-size:12px;background:var(--surface);border:1px solid var(--line);padding:7px 10px;border-radius:8px}
+/* setup paths */
+.paths{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:860px){.paths{grid-template-columns:1fr}}
+.pathcard{border:1px solid var(--line);border-radius:18px;padding:22px;background:var(--card)}
+.pathcard.featured{border-color:var(--accent);background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 8%, var(--card)),var(--card))}
+.pathcard h3{font-size:26px;letter-spacing:-.02em;margin:6px 0}
+.pathcard .time{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+/* tabs + code */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 12px}
+.tab{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:11px 18px;font-weight:700}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px}
+.steps{list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{counter-increment:s;display:flex;gap:14px;padding:13px 0;border-bottom:1px dashed var(--line)}
+.steps li:last-child{border:0}
+.steps li::before{content:counter(s,decimal-leading-zero);font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--accent);flex:0 0 34px}
+.codebox{background:var(--code);color:var(--code-ink);border-radius:14px;padding:16px 120px 16px 16px;font-family:"IBM Plex Mono",monospace;font-size:13px;line-height:1.7;overflow-wrap:anywhere;position:relative;margin-top:14px}
+.copybtn{position:absolute;top:10px;right:10px;background:#fff;color:#000;border:0;border-radius:999px;padding:8px 14px;font-weight:800;font-size:13px;min-height:36px}
+.checklist{list-style:none;padding:0;margin:14px 0 0}
+.checklist li{padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin:8px 0;display:flex;gap:10px;background:var(--card)}
+.checklist li::before{content:"✓";color:var(--teal);font-weight:900}
+/* devices */
+.devgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:900px){.devgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.devgrid{grid-template-columns:1fr}}
+.dev{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:18px;text-align:left;width:100%;color:var(--ink)}
+.dev[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.dev .ic{font-size:28px;display:block}
+.dev b{display:block;margin-top:8px;font-size:17px}
+.dev small{color:var(--muted)}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+@media(max-width:860px){.timeline{grid-template-columns:1fr}}
+.tl{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.tl .t{font-family:"IBM Plex Mono",monospace;color:var(--accent);font-size:12px;letter-spacing:.08em}
+.tl h4{margin:6px 0} .tl p{color:var(--muted);font-size:14px;margin:0}
+details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin:10px 0}
+summary{cursor:pointer;font-weight:800;padding:4px 0}
+footer{margin-top:80px;background:var(--ink);color:var(--bg);border-radius:22px 22px 0 0;padding:36px 22px 90px}
+footer h2{font-size:clamp(36px,7vw,72px);line-height:.9;letter-spacing:-.04em;text-transform:uppercase;margin:0 0 14px}
+footer a{color:inherit}
+.notice{border:1px solid var(--accent2);border-radius:14px;padding:14px 16px;background:color-mix(in srgb,var(--accent2) 10%, transparent)}
+</style>
+</head>
+<body>
+<div class="progressline" id="progressLine"></div>
+<div class="frame" aria-hidden="false">
+  <div class="frame-row">
+    <a class="brand" href="#top">DIRECT—STREAMS<span>.</span></a>
+    <nav class="fnav">
+      <a href="#system">System</a><a href="#server">Server setup</a><a href="#clients">Clients</a><a href="#daily">Daily use</a><a href="https://github.com/phuanh004/direct-streams-providers" target="_blank" rel="noopener">GitHub ↗</a><a href="/vi" style="font-weight:700">🇻🇳 Tiếng Việt</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap" id="top">
+  <!-- HERO : statement / film layout -->
+  <header class="hero">
+    <div class="hero-kicker"><span>For Nuvio · WuPlay · Stremio</span><span>No provider account · No API key</span><span><b>● Live</b> — streams go direct</span></div>
+    <h1>
+      <span class="line"><span>You pick.</span></span>
+      <span class="line"><span>It <em>finds</em> it.</span></span>
+      <span class="line"><span>TV plays.</span></span>
+    </h1>
+    <div class="hero-sub">
+      <div>
+        <p>Tiny scrapers that turn a title tap into a <strong>direct MP4 / HLS link</strong> — up to 4K, with subtitles, on a $30 Android TV box. This page is the whole manual: set up the server once, then use it every day, on every screen you own.</p>
+        <div class="hero-cta" style="margin-top:16px">
+          <a class="btn primary" href="#server">Set it up — 60 seconds →</a>
+          <a class="btn" href="#daily">How daily use works</a>
+        </div>
+      </div>
+      <div class="tv" aria-label="Live stream result preview">
+        <div class="tv-top"><span><span class="pulse"></span> NUVIO TV — NOW RESOLVING</span><b>TMDB 872585</b></div>
+        <div class="tv-body">
+          <div class="tv-title">Oppenheimer <em>— pick a quality</em></div>
+          <div class="streamrow hot"><span class="q">Movy · 2160p 4K HLS</span><span class="mono">SUBS 11 · PLAY →</span></div>
+          <div class="streamrow"><span class="q">7Movies · 1080p MP4</span><span class="mono">SUBS 8</span></div>
+          <div class="streamrow"><span class="q">7Movies · 720p MP4</span><span class="mono">FAST START</span></div>
+          <div class="packet"><i></i></div>
+          <p class="mono" style="font-size:11px;color:#9ca3af;margin:10px 0 0">CDN 206 Partial Content · okhttp/4.12.0 · hardware decode · 0 stalls</p>
+        </div>
+      </div>
+    </div>
+  </header>
+</div>
+
+<div class="marquee" aria-hidden="true"><div class="marquee-track" id="mq">DIRECT MP4 <span>✦</span> 4K HLS <span>✦</span> NO ACCOUNT <span>✦</span> SUBTITLES INCLUDED <span>✦</span> 9-SECOND DEADLINE <span>✦</span> WORKS ON CHEAP TV BOXES <span>✦</span> DIRECT MP4 <span>✦</span> 4K HLS <span>✦</span> NO ACCOUNT <span>✦</span> SUBTITLES INCLUDED <span>✦</span> 9-SECOND DEADLINE <span>✦</span> WORKS ON CHEAP TV BOXES <span>✦</span></div></div>
+
+<div class="wrap">
+  <!-- SYSTEM -->
+  <section id="system">
+    <div class="sec-head rv"><div><div class="num">01 — THE SYSTEM</div><h2>One tap,<br><em>four moves.</em></h2></div><p>Don Norman's rule still holds: if the model is clear, nothing feels mysterious. Learn this chain and you understand everything below.</p></div>
+    <div class="pipe rv" id="pipe">
+      <article class="pstep"><div class="n">01</div><h3>You pick</h3><p>Nuvio / WuPlay / Stremio sends only a TMDB ID — e.g. <span class="mono">872585</span>. No file lives in the app.</p></article>
+      <article class="pstep"><div class="n">02</div><h3>Scraper resolves</h3><p>7Movies or Movy asks its upstream, decrypts the hash / seed handshake, and caches the result.</p></article>
+      <article class="pstep"><div class="n">03</div><h3>Headers attached</h3><p><span class="mono">behaviorHints</span> tells ExoPlayer to send the okhttp user-agent — this is what fixes the 428 block.</p></article>
+      <article class="pstep"><div class="n">04</div><h3>TV plays direct</h3><p>CDN returns 206 Partial Content → Amlogic hardware decoder → smooth playback. No middleman server streams the video.</p></article>
+    </div>
+
+    <div class="sim" style="margin-top:14px">
+      <div class="mono" style="font-size:11px;letter-spacing:.1em;color:#fbbf24">TRY IT — LIVE SIMULATOR</div>
+      <h3 style="font-size:28px;letter-spacing:-.02em;margin:8px 0 4px">Press resolve. Watch the pipes light up.</h3>
+      <div class="sim-grid">
+        <div>
+          <div class="mono" style="font-size:12px;color:#9ca3af">TITLE</div>
+          <div class="chiprow" id="titleChips">
+            <button class="chipbtn" aria-pressed="true" data-title="Oppenheimer" data-id="872585" data-type="movie">Oppenheimer</button>
+            <button class="chipbtn" aria-pressed="false" data-title="Breaking Bad S01E01" data-id="1396" data-type="tv">Breaking Bad S01E01</button>
+            <button class="chipbtn" aria-pressed="false" data-title="Dune: Part Two" data-id="693134" data-type="movie">Dune: Part Two</button>
+          </div>
+          <div class="mono" style="font-size:12px;color:#9ca3af">PROVIDER</div>
+          <div class="chiprow" id="provChips">
+            <button class="chipbtn" aria-pressed="true" data-prov="Movy">Movy — 4K</button>
+            <button class="chipbtn" aria-pressed="false" data-prov="7Movies">7Movies — MP4</button>
+          </div>
+          <button class="runbtn" id="runSim">▶ Resolve stream</button>
+          <p style="color:#9ca3af;font-size:13px">Simulation uses the repo's real test outputs — Breaking Bad S01E01 really returned 4 streams with 8 subtitle tracks.</p>
+        </div>
+        <div class="sim-out" id="simOut">Ready. Pick a title and press Resolve.<br><span style="color:#6b7280">// output appears here, step by step</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROVIDERS : index style -->
+  <section>
+    <div class="sec-head rv"><div><div class="num">02 — PROVIDERS</div><h2>Three keys,<br><em>same door.</em></h2></div><p>They look alike in the picker. They are not alike inside. Read the badge before you tap — that's what it's for.</p></div>
+    <div class="indexlist rv">
+      <article class="irow"><div class="idx">/ 01</div><div><h3>7Movies</h3><p>Resolves 7movies.ac via VidLink. The reliable MP4 workhorse — start here when you just want it to play.</p><div class="specs"><span class="spec">360p–1080p MP4</span><span class="spec">Captions included</span><span class="spec">Backoff on 429 / 492</span><span class="spec">Hash cached 10 min</span></div></div><span class="badge live">● Live verified</span></article>
+      <article class="irow"><div class="idx">/ 02</div><div><h3>Movy</h3><p>Resolves movy.sx via api.wecollege.net. The quality leader — the only one that reaches true 4K, and it finds titles the others miss on fallback servers.</p><div class="specs"><span class="spec">Up to 2160p HLS</span><span class="spec">mvm1 seed handshake</span><span class="spec">13 servers · window of 3</span><span class="spec">Miami + Boise first</span></div></div><span class="badge live">● Live · 4K</span></article>
+      <article class="irow"><div class="idx">/ 03</div><div><h3>FlyStream</h3><p>Resolves flystream.net's <span class="mono">/api/streams</span> — one row per quality plus Auto. Powerful, but it only works when your own companion server is running (see Server Setup, Path B).</p><div class="specs"><span class="spec">HLS + Auto row</span><span class="spec">TMDB → IMDb lookup</span><span class="spec">Needs server.js on :7070</span></div></div><span class="badge needs">◐ Needs companion</span></article>
+    </div>
+  </section>
+
+  <!-- SERVER SETUP -->
+  <section id="server">
+    <div class="sec-head rv"><div><div class="num">03 — SERVER SETUP</div><h2>Setup on<br><em>the server.</em></h2></div><p>Two honest paths. Most people need Path A only. Path B unlocks FlyStream and gives WuPlay / Stremio a local manifest — pick where the little Node server lives.</p></div>
+
+    <div class="paths rv">
+      <article class="pathcard featured">
+        <div class="time">Path A · ~60 seconds · Recommended</div>
+        <h3>Zero-server — use the GitHub manifest</h3>
+        <p style="color:var(--muted)">7Movies + Movy run as plugins <em>inside</em> your player (QuickJS on the TV). There is nothing to host. Paste one URL into Nuvio and you're done — it syncs to the TV instantly.</p>
+        <ol class="steps">
+          <li><div>On phone or computer, open <a href="https://nuvioapp.space/account" target="_blank" rel="noopener"><strong>nuvioapp.space/account</strong></a> → sign in → <strong>Plugins → Add plugin</strong>.</div></li>
+          <li><div>Paste the manifest URL below → Save. Check the TV: the providers appear — that's your confirmation.</div></li>
+          <li><div>On the TV, enable <strong>Settings → Content &amp; Discovery → Plugins → “Enable plugin providers globally”</strong> (sideloaded Nuvio build required — Play Store builds disable plugins).</div></li>
+        </ol>
+        <div class="codebox">https://raw.githubusercontent.com/phuanh004/direct-streams-providers/refs/heads/main/manifest.json<button class="copybtn" data-copy="https://raw.githubusercontent.com/phuanh004/direct-streams-providers/refs/heads/main/manifest.json">Copy</button></div>
+      </article>
+
+      <article class="pathcard">
+        <div class="time">Path B · ~10 minutes · For FlyStream + self-host</div>
+        <h3>Companion server — run <span class="mono">server.js</span></h3>
+        <p style="color:var(--muted)">A zero-dependency Node server on port <strong>7070</strong>. It serves the manifest, injects its own address into FlyStream, and holds the challenge cookies FlyStream needs. Run it on a Pi, an always-on PC, or in the cloud.</p>
+        <ul class="checklist">
+          <li>Node.js 18+ (tested to Node 26)</li>
+          <li>Same Wi-Fi as the TV for LAN options — use the <span class="mono">.local</span> hostname, never a raw IP</li>
+          <li>Keep it running while you watch FlyStream titles</li>
+        </ul>
+        <div class="codebox">git clone https://github.com/phuanh004/direct-streams-providers.git<br>cd direct-streams-providers<br>npm install &nbsp;# esbuild<br>npm run build<br>npm run serve &nbsp;# → :7070<button class="copybtn" data-copy="git clone https://github.com/phuanh004/direct-streams-providers.git">Copy clone</button></div>
+      </article>
+    </div>
+
+    <div class="tabs rv" role="tablist" aria-label="Where to run the companion server">
+      <button class="tab" role="tab" aria-selected="true" data-stab="lan">🏠 Pi / PC at home (LAN)</button>
+      <button class="tab" role="tab" aria-selected="false" data-stab="cf">☁️ Cloudflare Workers</button>
+      <button class="tab" role="tab" aria-selected="false" data-stab="vercel">▲ Vercel</button>
+      <button class="tab" role="tab" aria-selected="false" data-stab="test">✓ Verify it works</button>
+    </div>
+    <div class="panel rv" id="spanel-lan">
+      <ol class="steps">
+        <li><div><strong>Run the server</strong> on the Pi / PC with the commands in Path B. Leave that terminal (or a pm2 / systemd service) running.</div></li>
+        <li><div><strong>Find its <span class="mono">.local</span> name</strong> — e.g. <span class="mono">raspberrypi.local</span> or your PC's hostname. A <span class="mono">.local</span> name survives DHCP changes; a raw IP silently breaks later.</div></li>
+        <li><div><strong>Give players this manifest</strong> (below). Every device on the same Wi-Fi can use the same URL.</div></li>
+      </ol>
+      <div class="codebox">http://&lt;companion-host&gt;.local:7070/manifest.json<button class="copybtn" data-copy="http://<companion-host>.local:7070/manifest.json">Copy</button></div>
+    </div>
+    <div class="panel rv" id="spanel-cf" hidden>
+      <ol class="steps">
+        <li><div>Deploy the included <span class="mono">worker.js</span> with <span class="mono">wrangler.toml</span> from the repo — same code, Cloudflare's edge instead of your Pi.</div></li>
+        <li><div>Use the Workers URL it prints as your manifest host, in the form <span class="mono">https://&lt;your-worker&gt;.&lt;account&gt;.workers.dev/manifest.json</span>.</div></li>
+        <li><div>Best when the TV isn't on your home LAN, or you don't want a box running 24/7.</div></li>
+      </ol>
+    </div>
+    <div class="panel rv" id="spanel-vercel" hidden>
+      <ol class="steps">
+        <li><div>Import the repo into Vercel — the same <span class="mono">server.js</span> deploys as the add-on server.</div></li>
+        <li><div>Use your deployment URL + <span class="mono">/manifest.json</span> in Nuvio / WuPlay / Stremio.</div></li>
+        <li><div>Re-deploy after updating the repo to pick up new provider builds.</div></li>
+      </ol>
+    </div>
+    <div class="panel rv" id="spanel-test" hidden>
+      <p style="margin-top:0">Run the offline suite first (no network, no hammering live APIs), then one live check:</p>
+      <div class="codebox">npm run test:offline &nbsp;# stubbed units + router + flystream + movy<br>npm test &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# live — keep occasional<button class="copybtn" data-copy="npm run test:offline">Copy</button></div>
+      <p style="color:var(--muted)">Healthy output looks like: Oppenheimer (872585) → 1 stream · Breaking Bad S01E01 (1396) → 4 streams, 1080p–360p, subs = 8.</p>
+    </div>
+    <div class="notice rv" style="margin-top:14px"><strong>Don't skip this:</strong> FlyStream returns <em>no streams</em> from the plain GitHub manifest. It only works through Path B, because the companion injects its own address when it serves <span class="mono">providers/flystream.js</span>.</div>
+  </section>
+
+  <!-- CLIENTS -->
+  <section id="clients">
+    <div class="sec-head rv"><div><div class="num">04 — CLIENT SETUP</div><h2>Setup on<br><em>each player.</em></h2></div><p>Same providers, three front doors. Do the server step once — then add the manifest to each player you actually use.</p></div>
+    <div class="tabs rv" role="tablist" aria-label="Player setup">
+      <button class="tab" role="tab" aria-selected="true" data-ctab="nuvio">📺 Nuvio — Android TV</button>
+      <button class="tab" role="tab" aria-selected="false" data-ctab="wuplay">WuPlay</button>
+      <button class="tab" role="tab" aria-selected="false" data-ctab="stremio">Stremio</button>
+    </div>
+    <div class="panel rv" id="cpanel-nuvio">
+      <ol class="steps">
+        <li><div><strong>Install the sideloaded Nuvio build</strong> on the TV (Play Store builds have plugins disabled by policy).</div></li>
+        <li><div><strong>Add the plugin from your phone</strong> — Path A above. It syncs to the TV immediately; no typing URLs with a remote.</div></li>
+        <li><div><strong>Or on the TV itself:</strong> Settings → Content &amp; Discovery → Plugins → Manage from phone (QR), or paste into “URL or short code” → + Add. Then switch ON “Enable plugin providers globally.”</div></li>
+      </ol>
+    </div>
+    <div class="panel rv" id="cpanel-wuplay" hidden>
+      <ol class="steps">
+        <li><div><strong>Start the companion server</strong> (Path B) — <span class="mono">npm run serve</span> on :7070.</div></li>
+        <li><div><strong>Open WuPlay config:</strong> on TV go to Settings → Configuration and scan the QR to open <a href="https://config.wuplay.app" target="_blank" rel="noopener">config.wuplay.app</a> — WuPlay keeps add-ons in its cloud profile, so this one setup follows you to every WuPlay device.</div></li>
+        <li><div><strong>Add the manifest</strong> in the <span class="mono">.local</span> form below.</div></li>
+      </ol>
+      <div class="codebox">http://&lt;your-host&gt;.local:7070/manifest.json<button class="copybtn" data-copy="http://<your-host>.local:7070/manifest.json">Copy</button></div>
+    </div>
+    <div class="panel rv" id="cpanel-stremio" hidden>
+      <ol class="steps">
+        <li><div><strong>Start the companion server</strong> (Path B) on :7070.</div></li>
+        <li><div><strong>Paste the manifest into Stremio's search bar</strong>, or open the <span class="mono">stremio://</span> form.</div></li>
+        <li><div><strong>Check:</strong> the add-on appears in your add-ons list and titles gain extra stream rows.</div></li>
+      </ol>
+      <p style="color:var(--muted)">Use the same <span class="mono">.local</span> hostname form as everywhere else on this page — Stremio accepts it, and it survives DHCP changes unlike a raw IP.</p>
+      <div class="codebox">http://&lt;your-host&gt;.local:7070/manifest.json<br>stremio://&lt;your-host&gt;.local:7070/manifest.json<button class="copybtn" data-copy="http://<your-host>.local:7070/manifest.json">Copy</button></div>
+    </div>
+  </section>
+
+  <!-- DAILY USE -->
+  <section id="daily">
+    <div class="sec-head rv"><div><div class="num">05 — DAILY USE</div><h2>Every day,<br><em>every screen.</em></h2></div><p>Setup is once. This is the part you live in. Tap a device to see its job — the system is designed so each screen does what it's best at.</p></div>
+
+    <div class="devgrid rv" role="group" aria-label="Pick a device">
+      <button class="dev" aria-pressed="true" data-dev="tv"><span class="ic">📺</span><b>TV — the cinema</b><small>Watch here. Big screen, hardware decode, 4K.</small></button>
+      <button class="dev" aria-pressed="false" data-dev="phone"><span class="ic">📱</span><b>Phone — the remote brain</b><small>Discover, queue, manage plugins, fix things.</small></button>
+      <button class="dev" aria-pressed="false" data-dev="tablet"><span class="ic">▦</span><b>Tablet — the couch screen</b><small>Second screen, travel, kids, kitchen.</small></button>
+      <button class="dev" aria-pressed="false" data-dev="desk"><span class="ic">💻</span><b>Laptop — the workshop</b><small>Server host, updates, testing, Stremio.</small></button>
+    </div>
+    <div class="panel rv" id="devPanel" style="margin-top:12px"></div>
+
+    <h3 class="rv" style="font-size:22px;letter-spacing:-.02em;margin:28px 0 4px">A normal day with it</h3>
+    <div class="timeline rv">
+      <article class="tl"><div class="t">ANYTIME — PHONE</div><h4>Find it on the bus</h4><p>Browse on your phone, open the title, check which provider has it and at what quality. Nothing to download — you're just scouting.</p></article>
+      <article class="tl"><div class="t">EVENING — TV</div><h4>Play it on the big screen</h4><p>Open the same title in Nuvio on TV. Pick <strong>Movy 2160p</strong> for the film, <strong>7Movies 1080p</strong> if the Wi-Fi is busy. Subtitles are already in the list — pick yours and play.</p></article>
+      <article class="tl"><div class="t">IN THE FILM — ANY SCREEN</div><h4>Choose like a regular</h4><p>Higher isn't always better: 1080p MP4 starts fastest and seeks cleanly; 4K HLS shines on a wired / strong-Wi-Fi TV. If one provider stalls, back out and take the same title from the other — that's why there are three.</p></article>
+      <article class="tl"><div class="t">TRAVEL — TABLET / LAPTOP</div><h4>Take it with you</h4><p>Path A travels free — the GitHub manifest works anywhere. Path B LAN manifests only work at home; away from home use Path A, or your Cloudflare / Vercel deployment.</p></article>
+    </div>
+
+    <div class="paths rv" style="margin-top:14px">
+      <article class="pathcard"><h3 style="margin-top:0">If a stream won't play</h3><ol class="steps"><li><div><strong>428 / blocked?</strong> You're on an old build — re-add the latest manifest so streams carry the okhttp headers.</div></li><li><div><strong>429 / empty list?</strong> Wait a minute. The providers back off and cache failures briefly on purpose — mashing retry makes it slower, not faster.</div></li><li><div><strong>FlyStream empty?</strong> Your companion server isn't running, or you used a raw IP that changed. Start <span class="mono">server.js</span>, use the <span class="mono">.local</span> URL.</div></li><li><div><strong>Nothing at all?</strong> In Nuvio, check “Enable plugin providers globally” is ON and you're on the sideloaded build.</div></li></ol></article>
+      <article class="pathcard"><h3 style="margin-top:0">Why it stays smooth</h3><p style="color:var(--muted)">Built for 1.5–2 GB TV boxes: a hard <strong>9-second deadline</strong> per provider, O(1) LRU/FIFO caches, shared in-flight lookups, and single-pass HLS parsing. 7Movies retries with exponential backoff + jitter and honours <span class="mono">Retry-After</span>; Movy tries one attempt per server — Miami and Boise first, sliding window of 3 — and caches a 429 for 30s instead of hammering the API.</p><p style="color:var(--muted)">Weekly habit: pull the repo, <span class="mono">npm run build</span>, restart the companion — two minutes, and every device picks it up from the same manifest.</p></article>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <div class="sec-head rv"><div><div class="num">06 — ANSWERS</div><h2>Before<br><em>you ask.</em></h2></div><p></p></div>
+    <details class="rv"><summary>Do I need an account or API key?</summary><p>No provider account or API key for the streams — just the manifest URL for 7Movies and Movy. The recommended Nuvio install uses your Nuvio sign-in at nuvioapp.space only to sync the plugin to your TV (or use the in-app TV method). FlyStream additionally needs your companion server running.</p></details>
+    <details class="rv"><summary>Do I need the server at all?</summary><p>Only for FlyStream, WuPlay, and Stremio add-on mode. For Nuvio with 7Movies + Movy, Path A (GitHub manifest) needs no server — the scrapers run on the TV itself.</p></details>
+    <details class="rv"><summary>What changed in this redesign?</summary><p>Rebuilt with <a href="https://github.com/leonxlnx/taste-skill" target="_blank" rel="noopener">Taste Skill</a> discipline — one design system, type-led layout, one idea per screen, motion that explains the product — and Awwwards 2026 patterns: oversized grotesk type with a serif-italic counter-voice, an index-style provider list, a live simulator instead of a static diagram, and a full server + daily-use playbook. Norman's conceptual model still opens the page; Huashu's anti-template rule still bans filler.</p></details>
+    <details class="rv"><summary>Where's the code?</summary><p><a href="https://github.com/phuanh004/direct-streams-providers" target="_blank" rel="noopener">github.com/phuanh004/direct-streams-providers</a> — MIT. Providers in <span class="mono">providers/</span>, server in <span class="mono">server.js</span> / <span class="mono">worker.js</span>, build via <span class="mono">build.js</span>.</p></details>
+  </section>
+
+  <footer class="rv">
+    <div class="mono" style="font-size:11px;letter-spacing:.1em;opacity:.7">SET IT UP ONCE —</div>
+    <h2>Play tonight,<br>on any screen.</h2>
+    <p style="max-width:560px;opacity:.85">Direct Streams Providers v1.0.14 · MIT · Verified live on onn. 4K Plus / Android TV — Amlogic hardware decoder, zero buffer stalls in the README test.</p>
+    <p><a href="https://github.com/phuanh004/direct-streams-providers" target="_blank" rel="noopener">Repo ↗</a> &nbsp;·&nbsp; <a href="#server">Server setup</a> &nbsp;·&nbsp; <a href="#daily">Daily use</a> &nbsp;·&nbsp; <a href="https://github.com/leonxlnx/taste-skill" target="_blank" rel="noopener">Taste Skill ↗</a></p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  // clock + progress
+  var clock=document.getElementById('clock'), pl=document.getElementById('progressLine');
+  function tickClock(){ if(!clock) return; try{ clock.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+' · LOCAL'; }catch(e){} }
+  tickClock(); setInterval(tickClock,30000);
+  window.addEventListener('scroll',function(){ var h=document.documentElement; var p=h.scrollTop/(h.scrollHeight-h.clientHeight||1); pl.style.width=(p*100)+'%'; },{passive:true});
+  // reveal
+  var io=('IntersectionObserver' in window)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.12}):null;
+  document.querySelectorAll('.rv').forEach(function(el){ if(io) io.observe(el); else el.classList.add('in'); });
+  // copy
+  document.querySelectorAll('[data-copy]').forEach(function(b){ b.addEventListener('click',function(){ var t=b.getAttribute('data-copy'); if(navigator.clipboard) navigator.clipboard.writeText(t); var o=b.textContent; b.textContent='Copied ✓'; setTimeout(function(){b.textContent=o;},1500); }); });
+  // generic tabs
+  function wireTabs(attr,prefix,ids){ var tabs=document.querySelectorAll('['+attr+']'); tabs.forEach(function(t){ t.addEventListener('click',function(){ tabs.forEach(function(x){x.setAttribute('aria-selected','false')}); t.setAttribute('aria-selected','true'); ids.forEach(function(id){ var p=document.getElementById(prefix+id); if(p) p.hidden=(id!==t.getAttribute(attr)); }); }); }); }
+  wireTabs('data-stab','spanel-',['lan','cf','vercel','test']);
+  wireTabs('data-ctab','cpanel-',['nuvio','wuplay','stremio']);
+  // simulator
+  var pipeSteps=document.querySelectorAll('#pipe .pstep');
+  var simOut=document.getElementById('simOut'), running=false;
+  function pickGroup(id){ var sel={title:'Oppenheimer',id:'872585',type:'movie',prov:'Movy'}; document.querySelectorAll('#titleChips .chipbtn').forEach(function(b){ if(b.getAttribute('aria-pressed')==='true'){ sel.title=b.dataset.title; sel.id=b.dataset.id; sel.type=b.dataset.type; } }); document.querySelectorAll('#provChips .chipbtn').forEach(function(b){ if(b.getAttribute('aria-pressed')==='true') sel.prov=b.dataset.prov; }); return sel; }
+  function chipWire(id){ document.querySelectorAll('#'+id+' .chipbtn').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('#'+id+' .chipbtn').forEach(function(x){x.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); }); }); }
+  chipWire('titleChips'); chipWire('provChips');
+  document.getElementById('runSim').addEventListener('click',function(){
+    if(running) return; running=true; var s=pickGroup();
+    var isBB=s.id==='1396', isMovy=s.prov==='Movy';
+    var lines=[
+      '→ TMDB '+s.id+' · '+s.type+' · "'+s.title+'"',
+      isMovy?'→ Movy: mvm1 seed handshake … <span class="ok">ok</span>':'→ 7Movies: enc-dec.app hash … <span class="ok">cached</span>',
+      isMovy?'→ Trying servers in site order — Miami, Boise … <span class="ok">hit</span>':'→ VidLink /api/b/'+s.type+'/{hash} … <span class="ok">200</span>',
+      '→ behaviorHints.proxyHeaders → UA okhttp/4.12.0 <span class="ok">attached</span>',
+      isBB?'<span class="ok">✓ 4 streams</span> · 1080p–360p · subs = 8 · CDN 206':'<span class="ok">✓ '+(isMovy?'2160p 4K HLS':'1080p MP4')+'</span> · subs = '+(isMovy?'11':'8')+' · CDN 206 · hardware decode',
+      '<span class="warn">Deadline used: '+(isMovy?'3.1s':'1.8s')+' / 9s</span> — press play on the TV.'
+    ];
+    simOut.innerHTML=''; pipeSteps.forEach(function(p){p.classList.remove('lit')});
+    lines.forEach(function(l,i){ setTimeout(function(){ simOut.innerHTML+=l+'<br>'; if(pipeSteps[Math.min(i,3)]) pipeSteps[Math.min(i,3)].classList.add('lit'); if(i===lines.length-1) running=false; }, 420*(i+1)); });
+  });
+  // devices
+  var devData={
+    tv:{h:'TV — where it all lands',b:'<ol class="steps"><li><div><strong>Open Nuvio / WuPlay</strong> and pick the title. Providers you added once appear as stream rows under it.</div></li><li><div><strong>Pick quality by room, not ego:</strong> Movy 2160p for the main TV on strong Wi-Fi; 7Movies 1080p for sticks and busy networks.</div></li><li><div><strong>Set subtitles once per title</strong> — tracks travel with the stream (8–11 on most titles).</div></li><li><div><strong>If it buffers:</strong> drop one quality step before blaming the provider — HLS adapts, MP4 starts fastest.</div></li></ol>'},
+    phone:{h:'Phone — discover & control',b:'<ol class="steps"><li><div><strong>Manage everything here:</strong> add / remove plugins at <span class="mono">nuvioapp.space/account</span> — changes sync to the TV instantly, no remote-typing.</div></li><li><div><strong>Scout during the day:</strong> check a title exists and which provider carries it in 4K before movie night.</div></li><li><div><strong>WuPlay config lives here too</strong> — scan the TV QR to open config.wuplay.app and edit add-ons from the couch.</div></li></ol>'},
+    tablet:{h:'Tablet — the flexible screen',b:'<ol class="steps"><li><div><strong>Same apps, same manifest:</strong> install Nuvio / Stremio, add the Path A manifest, and your providers are identical to the TV.</div></li><li><div><strong>Best for travel & second rooms</strong> — Path A works on any network; the home LAN manifest does not leave the house.</div></li><li><div><strong>Downloads are not part of this system</strong> — streams are direct and live; plan on Wi-Fi wherever you watch.</div></li></ol>'},
+    desk:{h:'Laptop — host & workshop',b:'<ol class="steps"><li><div><strong>Run the companion here if you have no Pi:</strong> <span class="mono">npm run serve</span> on :7070 while you watch FlyStream / Stremio titles.</div></li><li><div><strong>Update ritual:</strong> <span class="mono">git pull → npm run build → restart server</span>. Run <span class="mono">npm run test:offline</span> before movie night, not during.</div></li><li><div><strong>Watch here too</strong> via Stremio with the <span class="mono">stremio://</span> manifest — same streams, same subtitles.</div></li></ol>'}
+  };
+  var devPanel=document.getElementById('devPanel');
+  function showDev(k){ var d=devData[k]; devPanel.innerHTML='<h3 style="margin:0 0 6px;font-size:22px;letter-spacing:-.02em">'+d.h+'</h3>'+d.b; }
+  document.querySelectorAll('.dev').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('.dev').forEach(function(x){x.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); showDev(b.dataset.dev); }); });
+  showDev('tv');
+})();
+</script>
+</body>
+</html>
