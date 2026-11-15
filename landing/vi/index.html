@@ -106,9 +106,21 @@
     .brand {
       font-weight: 900;
       letter-spacing: -.03em;
-      font-size: 15px;
+      font-size: 14px;
       text-decoration: none;
-      line-height: 1
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(8px);
+      padding: 8px 12px;
+      border-radius: 999px;
+      transition: border-color .2s ease
+    }
+
+    .brand:hover {
+      border-color: var(--accent)
     }
 
     .brand span {
