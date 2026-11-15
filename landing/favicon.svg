@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#181715" />
+      <stop offset="100%" stop-color="#0a0a09" />
+    </linearGradient>
+    <linearGradient id="playGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5500" />
+      <stop offset="100%" stop-color="#ff3b00" />
+    </linearGradient>
+  </defs>
+  <!-- Background Container -->
+  <rect width="64" height="64" rx="16" fill="url(#bgGrad)" stroke="#2a2824" stroke-width="2" />
+  
+  <!-- TV / Screen Frame -->
+  <rect x="12" y="16" width="40" height="30" rx="6" fill="#141311" stroke="#33302a" stroke-width="2" />
+  
+  <!-- Antenna -->
+  <path d="M37 10 L32 16 L27 10" stroke="#ff3b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  
+  <!-- Play Triangle -->
+  <path d="M28 23.5 L40 31 L28 38.5 Z" fill="url(#playGrad)" />
+  
+  <!-- Live Indicator Dot -->
+  <circle cx="47" cy="21" r="2.5" fill="#2dd4bf" />
+  
+  <!-- Stand -->
+  <path d="M25 50 L39 50" stroke="#ffb800" stroke-width="2.5" stroke-linecap="round" />
+</svg>
